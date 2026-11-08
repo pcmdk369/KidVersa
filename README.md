@@ -70,10 +70,11 @@ Build and test the APK from Android Studio. The Android project is generated loc
 - No location collection or sharing.
 - No targeted advertising or behavioural ad profiles.
 - No in-app purchases in the current prototype.
-- Local progress is stored on the device; there is no account or cloud-sync backend in this version.
+- Local progress and a simple session-length setting are stored on the device; there is no account or cloud-sync backend in this version.
+- A basic arithmetic parent gate is a convenience screen only, not secure adult verification or a device-level restriction.
 - Do not enter a child's real name, contact details, school, or other personal information.
 
-**Important:** These are product design intentions, not a legal certification or a guarantee of regulatory compliance. Before release, complete a child-privacy review, accessibility review, security assessment, parental-consent analysis where applicable, and age-appropriate usability testing. The current parental controls, identity system, remote data protection, and enforceable screen-time controls are not implemented.
+**Important:** These are product design intentions, not a legal certification or a guarantee of regulatory compliance. Before release, complete a child-privacy review, accessibility review, security assessment, parental-consent analysis where applicable, and age-appropriate usability testing. The current parent area only offers local session-length settings and local star reset. Secure parent authentication, enforceable screen-time controls, identity, remote data protection, and cloud sync are not implemented.
 
 ## Quality status
 
