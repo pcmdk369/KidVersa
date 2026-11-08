@@ -1,0 +1,13 @@
+{
+  "id": "/",
+  "name": "KidVersa",
+  "short_name": "KidVersa",
+  "description": "Play, Learn, Create, Explore.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f7f8fc",
+  "theme_color": "#151d39",
+  "orientation": "portrait-primary",
+  "icons": [{"src":"/kidversa-icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+}
