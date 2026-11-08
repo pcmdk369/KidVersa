@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, CheckCircle2, RotateCcw, Trophy, X } from 'lucide-react';
 
 type Props = { gameId: string; onClose: () => void; onReward: (amount: number) => void };
@@ -46,6 +46,18 @@ export default function GameRoom({ gameId, onClose, onReward }: Props) {
   const [scienceIndex, setScienceIndex] = useState(0);
   const [scienceScore, setScienceScore] = useState(0);
 
+  const memoryDone = gameId === 'memory' && cards.every(card => card.matched);
+  useEffect(() => { if (memoryDone && !rewarded) { setRewarded(true); onReward(10); } }, [memoryDone, rewarded, onReward]);
+  useEffect(() => {
+    if (gameId !== 'quest') return;
+    const onKey = (event: KeyboardEvent) => {
+      const key = event.key.toLowerCase();
+      const moves: Record<string, [number, number]> = { arrowup: [0,-1], w: [0,-1], arrowdown: [0,1], s: [0,1], arrowleft: [-1,0], a: [-1,0], arrowright: [1,0], d: [1,0] };
+      if (moves[key]) { event.preventDefault(); move(moves[key][0], moves[key][1]); }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  });
   const done = gameId === 'memory' ? cards.every(card => card.matched)
     : gameId === 'racer' ? drives >= 12
     : gameId === 'quest' ? gems.length >= 5
