@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Gauge, Pause, Play, RotateCcw, Trophy, Volume2, VolumeX, X, Zap } from 'lucide-react';
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Gauge, MoveHorizontal, Pause, Play, RotateCcw, Trophy, Volume2, VolumeX, X, Zap } from 'lucide-react';
 import { playRaceEffect, startRaceAudio, stopRaceAudio, updateRaceAudio } from './raceAudio';
 import './race3d.css';
 
@@ -36,8 +36,8 @@ function Vehicle({ color, kind, position, rotation = 0 }: { color: string; kind:
   </group>;
 }
 
-function TrackWorld({ lane, color, kind, world, speed, paused, onCrash, onDistance }: {
-  lane: number; color: string; kind: CarKind; world: WorldKind; speed: number; paused: boolean;
+function TrackWorld({ lane, color, kind, world, speed, paused, drifting, onCrash, onDistance }: {
+  lane: number; color: string; kind: CarKind; world: WorldKind; speed: number; paused: boolean; drifting: boolean;
   onCrash: () => void; onDistance: (distance: number) => void;
 }) {
   const theme = palettes[world];
@@ -83,7 +83,7 @@ function TrackWorld({ lane, color, kind, world, speed, paused, onCrash, onDistan
         : <><mesh position={[0, 1.1, 0]}><cylinderGeometry args={[0.13, 0.2, 2.2, 8]} /><meshStandardMaterial color="#76523a" /></mesh><mesh position={[0, 2.5, 0]}><coneGeometry args={[1.25, 2.6, 7]} /><meshStandardMaterial color={world === 'desert' ? '#58804c' : world === 'beach' ? '#4d9d73' : '#2e8058'} /></mesh></>}
     </group>)}</group>
     <group ref={traffic}>{cars.map((car, i) => <group key={i} position={[laneX[car.lane], 0, car.z]}><Vehicle color={car.color} kind={i % 3 === 0 ? 'kart' : 'sport'} position={[0, 0, 0]} rotation={Math.PI} /></group>)}</group>
-    <Vehicle color={color} kind={kind} position={[laneX[lane], 0, 3.3]} />
+    <Vehicle color={color} kind={kind} position={[laneX[lane], 0, 3.3]} rotation={drifting ? 0.18 : 0} />
     <mesh position={[0, 0.02, 7]}><boxGeometry args={[8.2, 0.04, 0.12]} /><meshStandardMaterial color={theme.accent} /></mesh>
   </group>;
 }
@@ -107,6 +107,7 @@ export default function Race3DGame({ level, onClose, onReward }: Props) {
   const [soundOn, setSoundOn] = useState(() => localStorage.getItem('kidversa-race-sound') !== 'false');
   const [accelerating, setAccelerating] = useState(false);
   const [braking, setBraking] = useState(false);
+  const [drifting, setDrifting] = useState(false);
   const [status, setStatus] = useState('Pick your car and world, then start your race.');
   const target = mode === 'time' ? 500 : mode === 'championship' ? 1800 : 1000;
   const onDistance = (value: number) => { setDistance(value); if (value >= target && !finished) { setFinished(true); setPaused(true); setStatus('Finish line! Brilliant driving.'); if (soundOn) playRaceEffect('finish'); if (!rewarded) { setRewarded(true); onReward(12 + Math.min(8, Math.floor(level / 2))); } } };
@@ -120,19 +121,20 @@ export default function Race3DGame({ level, onClose, onReward }: Props) {
   const changeLane = (direction: number) => setLane(value => Math.max(0, Math.min(2, value + direction)));
   const boostStart = () => { if (nitro > 4 && started && !paused && !finished) { setBoosting(true); if (soundOn) playRaceEffect('boost'); } };
   const boostStop = () => setBoosting(false);
-  const restart = () => { setLane(1); setDistance(0); setCrashes(0); setSpeed(54); setNitro(100); setStarted(false); setPaused(false); setFinished(false); setRewarded(false); setBoosting(false); setAccelerating(false); setBraking(false); stopRaceAudio(); setRunId(value => value + 1); setStatus('Ready for another race.'); };
+  const drift = () => { if (started && !paused && !finished) { setDrifting(true); setSpeed(value => Math.min(96, value + 9)); setStatus('Perfect drift! Speed bonus earned.'); if (soundOn) playRaceEffect('boost'); window.setTimeout(() => setDrifting(false), 850); } };
+  const restart = () => { setLane(1); setDistance(0); setCrashes(0); setSpeed(54); setNitro(100); setStarted(false); setPaused(false); setFinished(false); setRewarded(false); setBoosting(false); setAccelerating(false); setBraking(false); setDrifting(false); stopRaceAudio(); setRunId(value => value + 1); setStatus('Ready for another race.'); };
   const progress = Math.min(100, distance / target * 100);
   return <div className="game-overlay race3d-overlay"><section className="race3d-panel">
     <header className="race3d-header"><div><span className="eyebrow">KIDVERSA 3D RACING WORLD · LEVEL {level}</span><h2>Turbo Track Legends</h2><p>Race smart, dodge safely, and collect your next star.</p></div><button className="icon-button" onClick={onClose} aria-label="Close 3D race"><X /></button></header>
     <div className="race3d-toolbar">
       <label>Race mode<select value={mode} onChange={e => setMode(e.target.value as RaceMode)} disabled={started}><option value="quick">Quick Race</option><option value="championship">Championship</option><option value="time">Time Trial</option></select></label>
       <label>World<select value={world} onChange={e => setWorld(e.target.value as WorldKind)} disabled={started}>{(Object.keys(palettes) as WorldKind[]).map(key => <option key={key} value={key}>{palettes[key].label}</option>)}</select></label>
-      <label>Car<select value={car} onChange={e => setCar(e.target.value as CarKind)} disabled={started}>{(Object.keys(carNames) as CarKind[]).map(key => <option key={key} value={key}>{carNames[key]}</option>)}</select></label>
+      <label>Car<select value={car} onChange={e => setCar(e.target.value as CarKind)} disabled={started}>{(Object.keys(carNames) as CarKind[]).map(key => <option key={key} value={key} disabled={(key === 'kart' && level < 2) || (key === 'super' && level < 3) || (key === 'monster' && level < 5)}>{carNames[key]}{(key === 'kart' && level < 2) ? ' · Level 2' : (key === 'super' && level < 3) ? ' · Level 3' : (key === 'monster' && level < 5) ? ' · Level 5' : ''}</option>)}</select></label>
       <label>Paint<span className="paint-options">{['#ff6b4a','#39a7ff','#a78bfa','#f6c453','#35bd91','#202938'].map(value => <button key={value} aria-label={'Paint ' + value} className={paint === value ? 'paint-dot selected' : 'paint-dot'} style={{ background: value }} onClick={() => setPaint(value)} disabled={started} />)}</span></label>
     </div>
     <div className="race3d-stage">
       <Canvas shadows dpr={[1, 1.5]} camera={{ position: [0, 6.4, 11.5], fov: 48 }} gl={{ antialias: false, powerPreference: 'high-performance' }}>
-        <TrackWorld key={runId} lane={lane} color={paint} kind={car} world={world} speed={speed} paused={!started || paused || finished} onCrash={onCrash} onDistance={onDistance} />
+        <TrackWorld key={runId} lane={lane} color={paint} kind={car} world={world} speed={speed} paused={!started || paused || finished} drifting={drifting} onCrash={onCrash} onDistance={onDistance} />
       </Canvas>
       <div className="race3d-hud"><span><Gauge size={15}/> {Math.round(speed)} km/h</span><span><Zap size={15}/> Nitro {Math.round(nitro)}%</span><span>Distance {Math.round(distance)} / {target} m</span></div>
       <div className="race3d-progress"><i style={{ width: progress + '%' }} /></div>
@@ -141,7 +143,7 @@ export default function Race3DGame({ level, onClose, onReward }: Props) {
       {finished && <div className="race3d-finish"><Trophy size={34}/><strong>Race complete!</strong><p>You earned {12 + Math.min(8, Math.floor(level / 2))} stars. Great driving!</p><button className="primary-game-button" onClick={restart}><RotateCcw size={16}/> Race again</button></div>}
     </div>
     <div className="race3d-bottom"><div className="race3d-stats"><span>Rival bumps <b>{crashes}</b></span><span>Race progress <b>{Math.round(progress)}%</b></span><span>{status}</span></div>
-      <div className="race3d-controls"><button className="race-steer" onClick={() => changeLane(-1)} aria-label="Steer left" disabled={!started || paused || finished}><ArrowLeft/></button><button className="race-steer" onClick={() => changeLane(1)} aria-label="Steer right" disabled={!started || paused || finished}><ArrowRight/></button><button className="race-accelerate" onPointerDown={() => setAccelerating(true)} onPointerUp={() => setAccelerating(false)} onPointerLeave={() => setAccelerating(false)} onPointerCancel={() => setAccelerating(false)} disabled={!started || paused || finished}><ArrowUp size={17}/> Gas</button><button className="race-brake" onPointerDown={() => setBraking(true)} onPointerUp={() => setBraking(false)} onPointerLeave={() => setBraking(false)} onPointerCancel={() => setBraking(false)} disabled={!started || paused || finished}><ArrowDown size={17}/> Brake</button><button className="race-action" onClick={() => { if (started && !finished) setPaused(value => !value); }} disabled={!started || finished}><Pause size={17}/>{paused ? 'Resume' : 'Pause'}</button><button className="race-nitro" onPointerDown={boostStart} onPointerUp={boostStop} onPointerLeave={boostStop} onContextMenu={e => e.preventDefault()} disabled={!started || paused || finished || nitro < 5}><Zap size={17}/> Nitro</button><button className="race-action" onClick={() => setSoundOn(value => !value)} aria-label={soundOn ? 'Mute race sounds' : 'Enable race sounds'}>{soundOn ? <Volume2 size={17}/> : <VolumeX size={17}/>} Sound</button></div>
+      <div className="race3d-controls"><button className="race-steer" onClick={() => changeLane(-1)} aria-label="Steer left" disabled={!started || paused || finished}><ArrowLeft/></button><button className="race-steer" onClick={() => changeLane(1)} aria-label="Steer right" disabled={!started || paused || finished}><ArrowRight/></button><button className="race-accelerate" onPointerDown={() => setAccelerating(true)} onPointerUp={() => setAccelerating(false)} onPointerLeave={() => setAccelerating(false)} onPointerCancel={() => setAccelerating(false)} disabled={!started || paused || finished}><ArrowUp size={17}/> Gas</button><button className="race-brake" onPointerDown={() => setBraking(true)} onPointerUp={() => setBraking(false)} onPointerLeave={() => setBraking(false)} onPointerCancel={() => setBraking(false)} disabled={!started || paused || finished}><ArrowDown size={17}/> Brake</button><button className="race-action" onClick={drift} disabled={!started || paused || finished}><MoveHorizontal size={17}/> Drift</button><button className="race-action" onClick={() => { if (started && !finished) setPaused(value => !value); }} disabled={!started || finished}><Pause size={17}/>{paused ? 'Resume' : 'Pause'}</button><button className="race-nitro" onPointerDown={boostStart} onPointerUp={boostStop} onPointerLeave={boostStop} onContextMenu={e => e.preventDefault()} disabled={!started || paused || finished || nitro < 5}><Zap size={17}/> Nitro</button><button className="race-action" onClick={() => setSoundOn(value => !value)} aria-label={soundOn ? 'Mute race sounds' : 'Enable race sounds'}>{soundOn ? <Volume2 size={17}/> : <VolumeX size={17}/>} Sound</button></div>
     </div>
     <p className="race3d-note">Kid-safe arcade racing · No purchases · Progress stays on this device</p>
   </section></div>;
