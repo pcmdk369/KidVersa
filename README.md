@@ -7,13 +7,13 @@ KidVersa is a privacy-first games platform in development for children aged **9�
 ## Current implementation
 
 ### Playable game experiences
-- **Memory Galaxy** — match six pairs; move counter and completion reward.
+- **Memory Galaxy** — match six to fifteen pairs as levels advance; move counter and completion reward.
 - **Number Dash** — arithmetic rounds scale from 8 to 20 questions with level-based number ranges.
 - **Speed Racers** — three-lane obstacle-dodging challenge scales from 12 to 30 track sections.
 - **Adventure Quest** — grid exploration, crystal collection, and keyboard/touch movement.
 - **Creative Builder** — 8×8 tile-based pixel-art canvas with a colour palette.
 - **Sports Arena** — penalty challenge scales from 5 to 10 shots.
-- **Space Explorer** — short science and general-knowledge quiz.
+- **Space Explorer** — five to fifteen science and general-knowledge questions as levels advance.
 
 ### Game hub
 - Responsive game library with search and category filters.
@@ -21,7 +21,7 @@ KidVersa is a privacy-first games platform in development for children aged **9�
 - Ten-level local progression per game, with difficulty scaling in maths, racing, and sports.
 - Local accessibility preferences: larger text, higher contrast, and reduced motion.
 - Responsive visual system with progress indicators, level badges, visible keyboard focus, and larger interactive controls.
-- Local star count saved in browser storage.
+- Local stars, per-game levels, accessibility preferences, session preferences, and Creative Builder artwork saved in browser storage.
 - Installable web-app manifest and basic service-worker shell caching.
 - Capacitor configuration for packaging the web app as an Android project.
 - GitHub Actions build workflow.
