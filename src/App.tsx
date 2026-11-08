@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Brain, CarFront, Compass, Gamepad2, Rocket, Search, ShieldCheck, Trophy, WandSparkles, Volleyball, X, RotateCcw, Star } from 'lucide-react';
 
 type Game = { id: string; title: string; category: string; description: string; icon: typeof Brain; tone: string; tag: string };
@@ -20,6 +20,7 @@ function MemoryGame({ onClose, onWin }: { onClose: () => void; onWin: () => void
   const [picked, setPicked] = useState<string[]>([]);
   const [moves, setMoves] = useState(0);
   const [locked, setLocked] = useState(false);
+  const [reported, setReported] = useState(false);
   const done = cards.every(card => card.matched);
   function choose(id: string) {
     if (locked || picked.includes(id) || cards.find(card => card.id === id)?.matched || done) return;
@@ -34,8 +35,8 @@ function MemoryGame({ onClose, onWin }: { onClose: () => void; onWin: () => void
       }
     }
   }
-  if (done) onWin();
-  return <div className="game-overlay"><section className="game-panel"><div className="game-top"><div><span className="eyebrow">BRAIN ACADEMY</span><h2>Memory Galaxy</h2><p>Find all six matching pairs.</p></div><button className="icon-button" onClick={onClose} aria-label="Close game"><X /></button></div><div className="game-stats"><span>Moves <b>{moves}</b></span><span>Pairs <b>{cards.filter(c => c.matched).length}/6</b></span></div><div className="memory-grid">{cards.map(card => { const visible = card.matched || picked.includes(card.id); return <button key={card.id} className={`memory-card ${visible ? 'revealed' : ''} ${card.matched ? 'matched' : ''}`} onClick={() => choose(card.id)} aria-label={visible ? card.symbol : 'Hidden card'}>{visible ? card.symbol : '?'}</button>; })}</div><div className="game-actions"><button className="secondary-button" onClick={() => { setCards(shuffledCards()); setPicked([]); setMoves(0); setLocked(false); }}><RotateCcw size={16}/> Restart</button><span className="hint">Take your time — there is no timer.</span></div>{done && <div className="win-message"><Trophy /> Great job! You matched every pair.</div>}</section></div>;
+  useEffect(() => { if (done && !reported) { setReported(true); onWin(); } }, [done, reported, onWin]);
+  return <div className="game-overlay"><section className="game-panel"><div className="game-top"><div><span className="eyebrow">BRAIN ACADEMY</span><h2>Memory Galaxy</h2><p>Find all six matching pairs.</p></div><button className="icon-button" onClick={onClose} aria-label="Close game"><X /></button></div><div className="game-stats"><span>Moves <b>{moves}</b></span><span>Pairs <b>{cards.filter(c => c.matched).length}/6</b></span></div><div className="memory-grid">{cards.map(card => { const visible = card.matched || picked.includes(card.id); return <button key={card.id} className={`memory-card ${visible ? 'revealed' : ''} ${card.matched ? 'matched' : ''}`} onClick={() => choose(card.id)} aria-label={visible ? card.symbol : 'Hidden card'}>{visible ? card.symbol : '?'}</button>; })}</div><div className="game-actions"><button className="secondary-button" onClick={() => { setCards(shuffledCards()); setPicked([]); setMoves(0); setLocked(false); setReported(false); }}><RotateCcw size={16}/> Restart</button><span className="hint">Take your time — there is no timer.</span></div>{done && <div className="win-message"><Trophy /> Great job! You matched every pair.</div>}</section></div>;
 }
 
 export default function App() {
