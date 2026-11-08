@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, RotateCcw, Trophy, X } from 'lucide-react';
 
 type Props = { gameId: string; onClose: () => void; onReward: (amount: number) => void };
@@ -20,7 +20,7 @@ function makeQuestion(): Question {
   const choices = Array.from(new Set([answer, answer + 2, Math.max(1, answer - 3), answer + 7])).sort(() => Math.random() - .5);
   return { prompt: `${a} ${answer === a + b ? '+' : '×'} ${b} = ?`, answer, choices };
 }
-function ActionButton({ children, onClick, label }: { children: React.ReactNode; onClick: () => void; label: string }) {
+function ActionButton({ children, onClick, label }: { children: ReactNode; onClick: () => void; label: string }) {
   return <button className="play-control" onClick={onClick} aria-label={label}>{children}</button>;
 }
 export default function GameRoom({ gameId, onClose, onReward }: Props) {
