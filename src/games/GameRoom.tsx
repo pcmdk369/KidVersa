@@ -71,7 +71,7 @@ export default function GameRoom({ gameId, level, onClose, onReward }: Props) {
     : gameId === 'racer' ? drives >= raceTarget
     : gameId === 'quest' ? gems.length >= 5
     : gameId === 'sports' ? shots >= shotTarget
-    : gameId === 'builder' ? false
+    : gameId === 'builder' ? complete
     : gameId === 'space' ? scienceIndex >= scienceTarget
     : gameId === 'number' ? round >= mathTarget : complete;
 
