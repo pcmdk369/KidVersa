@@ -26,3 +26,42 @@ button,a,input,select{font-family:inherit}button:focus-visible,a:focus-visible,i
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 
 .achievement-shelf{padding:38px 8% 12px;background:#fff}.achievement-heading h2{font-size:22px;letter-spacing:-.6px;margin:8px 0}.achievement-heading p{font-size:12px;color:#858ca1;margin:0}.achievement-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:20px 0 10px}.achievement{display:flex;align-items:center;gap:12px;padding:14px;background:#f7f7fb;border:1px solid #eceef5;border-radius:14px;opacity:.68}.achievement.unlocked{opacity:1;background:linear-gradient(120deg,#fff9e9,#f4f0ff);border-color:#f2e2b5}.achievement-medal{width:38px;height:38px;border-radius:12px;background:#e8e9f1;color:#8c91a5;display:grid;place-items:center;font-size:18px;font-weight:950}.achievement.unlocked .achievement-medal{background:#ffe6a7;color:#a56c1b}.achievement b,.achievement small{display:block}.achievement b{font-size:11px;color:#323c5b}.achievement small{font-size:9px;color:#858ca1;margin-top:4px}@media(max-width:760px){.achievement-shelf{padding:30px 5% 8px}.achievement-list{grid-template-columns:1fr}.achievement{padding:11px}}
+
+
+/* Distinct game-world cover art — CSS illustrations, no stock thumbnails */
+.game-art{isolation:isolate;min-height:154px}
+.game-art:before,.game-art:after{z-index:-1}
+.game-art svg{width:58px;height:58px;padding:12px;border-radius:20px;background:#ffffff24;backdrop-filter:blur(4px);box-shadow:0 12px 30px #11152c24}
+.art-memory{background:radial-gradient(circle at 72% 28%,#f8c7ff 0 5%,transparent 6%),radial-gradient(circle at 25% 80%,#b6a5ff 0 7%,transparent 8%),linear-gradient(135deg,#5746ba,#a07bf4)}
+.art-number{background:radial-gradient(circle at 22% 24%,#ffe18b 0 8%,transparent 9%),radial-gradient(circle at 78% 78%,#9ee7f2 0 10%,transparent 11%),linear-gradient(135deg,#276fba,#61c7e9)}
+.art-racer{background:radial-gradient(ellipse at 50% 115%,#ffe09a 0 22%,transparent 23%),linear-gradient(145deg,#f17a56,#ffbd70 55%,#f4dc87)}
+.art-quest{background:radial-gradient(circle at 72% 22%,#fff0a8 0 7%,transparent 8%),radial-gradient(ellipse at 30% 110%,#7de2a7 0 27%,transparent 28%),linear-gradient(135deg,#167e77,#62c9a1)}
+.art-builder{background:radial-gradient(circle at 22% 25%,#ffd3e9 0 9%,transparent 10%),radial-gradient(circle at 80% 78%,#fce18b 0 11%,transparent 12%),linear-gradient(135deg,#bd61a5,#ed9dc4)}
+.art-sports{background:radial-gradient(ellipse at 50% 110%,#b7f1d1 0 28%,transparent 29%),linear-gradient(135deg,#177d9a,#55c9c3)}
+.art-space{background:radial-gradient(circle at 22% 25%,#fff0a0 0 3%,transparent 4%),radial-gradient(circle at 80% 72%,#b2a9ff 0 5%,transparent 6%),linear-gradient(135deg,#252c76,#7165d5)}
+.art-memory .art-spark,.art-number .art-spark,.art-racer .art-spark,.art-quest .art-spark,.art-builder .art-spark,.art-sports .art-spark,.art-space .art-spark{font-size:30px;text-shadow:0 2px 12px #17142d55}
+.game-card{display:flex;flex-direction:column}
+.game-card-body{display:flex;flex-direction:column;flex:1}
+.game-card-body .card-link{margin-top:auto}
+.game-card-progress{margin-top:17px}
+.game-card:focus-within{outline:3px solid #ffcb73;outline-offset:3px}
+.filters{padding-bottom:4px}
+.filter{min-height:38px}
+.hero-art .planet-main{font-size:50px}
+.achievement{min-height:66px}
+@media(max-width:760px){
+ .game-art{min-height:130px}
+ .game-art svg{width:54px;height:54px}
+ .game-card-body{min-height:210px}
+ .hero{min-height:540px}
+}
+@media(max-width:420px){
+ .game-grid{gap:10px}
+ .game-art{min-height:112px}
+ .game-art svg{width:48px;height:48px}
+ .game-card-body{padding:12px;min-height:215px}
+ .game-card h3{font-size:14px}
+ .game-card p{font-size:11px}
+ .game-card-progress{font-size:8px}
+ .card-link{font-size:11px;padding:10px 8px}
+}
