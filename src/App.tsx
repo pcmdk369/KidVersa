@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from 'react';
-import { Brain, CarFront, Compass, Gamepad2, Rocket, Search, ShieldCheck, Trophy, WandSparkles, Volleyball, Star } from 'lucide-react';
+import { Brain, CarFront, Compass, Gamepad2, Rocket, Search, ShieldCheck, Trophy, WandSparkles, Volleyball, Star, X } from 'lucide-react';
 import GameRoom from './games/GameRoom';
 
 type Game = { id: string; title: string; category: string; description: string; icon: typeof Brain; tone: string };
