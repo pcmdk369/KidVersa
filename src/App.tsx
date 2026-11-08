@@ -2,6 +2,18 @@ import { useMemo, useState, useEffect } from 'react';
 import { Brain, CarFront, Compass, Gamepad2, Rocket, Search, ShieldCheck, Trophy, WandSparkles, Volleyball, Star } from 'lucide-react';
 import GameRoom from './games/GameRoom';
 
+type Game = { id: string; title: string; category: string; description: string; icon: typeof Brain; tone: string };
+const games: Game[] = [
+  { id: 'memory', title: 'Memory Galaxy', category: 'Brain Academy', description: 'Match hidden pairs and train your memory.', icon: Brain, tone: 'violet' },
+  { id: 'number', title: 'Number Dash', category: 'Brain Academy', description: 'Solve arithmetic challenges and build confidence.', icon: Star, tone: 'blue' },
+  { id: 'racer', title: 'Speed Racers', category: 'Speed Racers', description: 'Switch lanes and steer through a colourful race.', icon: CarFront, tone: 'orange' },
+  { id: 'quest', title: 'Adventure Quest', category: 'Adventure Quest', description: 'Explore a map, collect crystals, and find the gate.', icon: Compass, tone: 'green' },
+  { id: 'builder', title: 'Creative Builder', category: 'Creative Builder', description: 'Paint tiles and create your own pixel-art world.', icon: WandSparkles, tone: 'pink' },
+  { id: 'sports', title: 'Sports Arena', category: 'Sports Arena', description: 'Take five penalty shots and aim for the goal.', icon: Volleyball, tone: 'teal' },
+  { id: 'space', title: 'Space Explorer', category: 'Space Explorer', description: 'Discover science facts across the solar system.', icon: Rocket, tone: 'indigo' },
+];
+const categories = ['All games', 'Brain Academy', 'Speed Racers', 'Adventure Quest', 'Creative Builder', 'Sports Arena', 'Space Explorer'];
+
 export default function App() {
   const [category, setCategory] = useState('All games');
   const [query, setQuery] = useState('');
