@@ -138,7 +138,7 @@ export default function GameRoom({ gameId, level, onClose, onReward }: Props) {
     }
   }
   function reset() {
-    setRound(0); setScore(0); setComplete(false); setRewarded(false); setQuestion(makeQuestion());
+    setRound(0); setScore(0); setComplete(false); setRewarded(false); setQuestion(makeQuestion(level));
     setCards(() => [...['SUN','MOON','STAR','RAINBOW','LEAF','PLANET'], ...['SUN','MOON','STAR','RAINBOW','LEAF','PLANET']].sort(() => Math.random() - .5).map((symbol, i) => ({ id: i, symbol, matched: false })));
     setPicked([]); setMoves(0); setLane(1); setDrives(0); setHits(0); setPosition({x:0,y:0}); setGems([]);
     setTiles(Array(64).fill('')); setShots(0); setGoals(0); setLastShot(''); setScienceIndex(0); setScienceScore(0); setMessage('Ready for a new round.');
