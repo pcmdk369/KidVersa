@@ -10,10 +10,11 @@ KidVersa is a privacy-first games platform in development for children aged **9â
 
 - Built with **Three.js + React Three Fiber** on React 19.
 - Real-time 3D scene with modeled player vehicles, rival traffic, moving road markings, roadside scenery, lighting, fog, and themed environments.
-- Four selectable vehicle classes: Street Racer, Hyper GT, Turbo Kart, and Monster Truck; six paint colours.
+- Four vehicle classes: Street Racer, Hyper GT (level 3), Turbo Kart (level 2), and Monster Truck (level 5); six paint colours.
 - Five selectable environments: Neon City, Sunset Desert, Emerald Forest, Cloud Peaks, and Sunny Coast.
 - Three race modes: Quick Race, Championship distance, and Time Trial distance.
-- Three-lane steering, acceleration, braking, nitro boost, rival-car collision feedback, pause/resume, race restart, and finish rewards.
+- Three-lane steering, acceleration, braking, arcade drifting, nitro boost, rival-car collision feedback, pause/resume, race restart, and finish rewards.
+- Upgrade tuning presets: Balanced, Speed Engine, Grip Handling, and Nitro Efficiency.
 - Keyboard support (arrow keys / WASD / Space) and large touch-friendly mobile controls.
 - Procedurally synthesized optional engine tone, ambient music layer, nitro, collision, and victory effects. Sound can be muted.
 - Local level and star rewards use the existing KidVersa progress system. No account, cloud profile, purchases, ads, or public chat are added by the racing game.
