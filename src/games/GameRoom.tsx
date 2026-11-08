@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, CheckCircle2, RotateCcw, Trophy, X } from 'lucide-react';
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, RotateCcw, Trophy, X } from 'lucide-react';
 
 type Props = { gameId: string; onClose: () => void; onReward: (amount: number) => void };
 type Question = { prompt: string; answer: number; choices: number[] };
