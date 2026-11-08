@@ -43,7 +43,8 @@ export default function GameRoom({ gameId, level, onClose, onReward }: Props) {
   const [hits, setHits] = useState(0);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [gems, setGems] = useState<string[]>([]);
-  const [tiles, setTiles] = useState<string[]>(Array(64).fill(''));
+  const [tiles, setTiles] = useState<string[]>(() => { try { const saved = JSON.parse(localStorage.getItem('kidversa-builder-art') || 'null'); return Array.isArray(saved) && saved.length === 64 ? saved : Array(64).fill(''); } catch { return Array(64).fill(''); } });
+  useEffect(() => { localStorage.setItem('kidversa-builder-art', JSON.stringify(tiles)); }, [tiles]);
   const [paint, setPaint] = useState('violet');
   const [shots, setShots] = useState(0);
   const [goals, setGoals] = useState(0);
