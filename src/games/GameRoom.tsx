@@ -15,7 +15,7 @@ const titles: Record<string, string> = {
   quest: 'Adventure Quest', builder: 'Creative Builder', sports: 'Sports Arena', space: 'Space Explorer',
 };
 function makeQuestion(): Question {
-  const a = 2 + Math.floor(Math.random() * 18), b = 2 + Math.floor(Math.random() * 12);
+  const a = 2 + Math.floor(Math.random() * (14 + level * 4)), b = 2 + Math.floor(Math.random() * (8 + level * 2));
   const answer = Math.random() > .5 ? a + b : a * b;
   const choices = Array.from(new Set([answer, answer + 2, Math.max(1, answer - 3), answer + 7])).sort(() => Math.random() - .5);
   return { prompt: `${a} ${answer === a + b ? '+' : '×'} ${b} = ?`, answer, choices };
@@ -45,6 +45,9 @@ export default function GameRoom({ gameId, level, onClose, onReward }: Props) {
   const [lastShot, setLastShot] = useState('');
   const [scienceIndex, setScienceIndex] = useState(0);
   const [scienceScore, setScienceScore] = useState(0);
+  const mathTarget = Math.min(20, 8 + Math.max(0, level - 1) * 2);
+  const raceTarget = Math.min(30, 12 + Math.max(0, level - 1) * 2);
+  const shotTarget = Math.min(10, 5 + Math.max(0, level - 1));
 
   const memoryDone = gameId === 'memory' && cards.every(card => card.matched);
   useEffect(() => { if (memoryDone && !rewarded) { setRewarded(true); onReward(10); } }, [memoryDone, rewarded, onReward]);
@@ -59,23 +62,23 @@ export default function GameRoom({ gameId, level, onClose, onReward }: Props) {
     return () => window.removeEventListener('keydown', onKey);
   });
   const done = gameId === 'memory' ? cards.every(card => card.matched)
-    : gameId === 'racer' ? drives >= 12
+    : gameId === 'racer' ? drives >= raceTarget
     : gameId === 'quest' ? gems.length >= 5
-    : gameId === 'sports' ? shots >= 5
+    : gameId === 'sports' ? shots >= shotTarget
     : gameId === 'builder' ? false
     : gameId === 'space' ? scienceIndex >= questionBank.length
-    : gameId === 'number' ? round >= 8 : complete;
+    : gameId === 'number' ? round >= mathTarget : complete;
 
   function finish(extra = 0) {
     setComplete(true);
     if (!rewarded) { setRewarded(true); onReward(Math.max(5, Math.min(20, score + extra))); }
   }
   function answerMath(value: number) {
-    if (complete || round >= 8) return;
+    if (complete || round >= mathTarget) return;
     if (value === question.answer) { setScore(s => s + 2); setMessage('Correct! Great thinking.'); }
     else setMessage(`Good try. The answer was ${question.answer}.`);
     const next = round + 1; setRound(next);
-    if (next >= 8) finish(value === question.answer ? 2 : 0);
+    if (next >= mathTarget) finish(value === question.answer ? 2 : 0);
     else setQuestion(makeQuestion());
   }
   function flip(index: number) {
@@ -94,12 +97,12 @@ export default function GameRoom({ gameId, level, onClose, onReward }: Props) {
     }
   }
   function drive() {
-    if (drives >= 12 || complete) return;
-    const obstacle = (drives * 7 + 2) % 3;
+    if (drives >= raceTarget || complete) return;
+    const obstacle = (drives * 7 + level * 2) % 3;
     if (lane === obstacle) { setHits(h => h + 1); setMessage('Obstacle! Change lanes next time.'); }
-    else { setScore(s => s + 1); setMessage('Nice driving! Clear road.'); }
+    else { setScore(s => s + 1 + Math.floor(level / 3)); setMessage('Nice driving! Clear road.'); }
     const next = drives + 1; setDrives(next);
-    if (next === 12) finish();
+    if (next === raceTarget) finish();
   }
   function move(dx: number, dy: number) {
     if (complete) return;
@@ -114,14 +117,14 @@ export default function GameRoom({ gameId, level, onClose, onReward }: Props) {
     }
   }
   function shoot(zone: number) {
-    if (shots >= 5 || complete) return;
+    if (shots >= shotTarget || complete) return;
     const keeper = (shots * 2 + 1) % 5;
     const scored = zone !== keeper;
     const next = shots + 1;
     setShots(next); setGoals(g => g + (scored ? 1 : 0));
     setLastShot(scored ? 'GOAL! Great aim.' : 'The keeper saved it. Try again.');
     if (scored) setScore(s => s + 2);
-    if (next === 5) finish(scored ? 2 : 0);
+    if (next === shotTarget) finish(scored ? 2 : 0);
   }
   function chooseScience(value: string) {
     const item = questionBank[scienceIndex];
@@ -150,10 +153,10 @@ export default function GameRoom({ gameId, level, onClose, onReward }: Props) {
     <div className="level-track"><div><span>LEVEL {level}</span><b>{Math.min(100, (level - 1) * 11)}% progress</b></div><div className="level-track-bar"><i style={{width: `${Math.min(100, (level - 1) * 11)}%`}}/></div></div><div className="game-stats"><span>Score <b>{score}</b></span><span>Round <b>{gameId === 'memory' ? moves : gameId === 'racer' ? drives : gameId === 'sports' ? shots : gameId === 'space' ? scienceIndex : round}</b></span><span>{gameId === 'quest' ? 'Crystals' : gameId === 'sports' ? 'Goals' : 'Best effort'} <b>{gameId === 'quest' ? gems.length : gameId === 'sports' ? goals : gameId === 'racer' ? hits + ' bumps' : 'Keep going'}</b></span></div>
     {gameId === 'memory' && <><p className="game-instruction">Match all six pairs. Remember where each symbol is hiding.</p><div className="memory-grid">{cards.map(card => { const visible = card.matched || picked.includes(card.id); return <button key={card.id} className={`memory-card ${visible ? 'revealed' : ''} ${card.matched ? 'matched' : ''}`} onClick={() => flip(card.id)} aria-label={visible ? card.symbol : 'Hidden card'}>{visible ? card.symbol : '?'}</button>; })}</div></>}
     {gameId === 'number' && <div className="challenge-box"><span className="eyebrow">MATH CHALLENGE</span><h3>{question.prompt}</h3><p>{message}</p><div className="answer-grid">{question.choices.map(n => <button key={n} className="answer-button" onClick={() => answerMath(n)} disabled={complete}>{n}</button>)}</div></div>}
-    {gameId === 'racer' && <div className="race-board"><p className="game-instruction">Switch lanes to avoid the next obstacle, then drive forward.</p><div className="road">{[0,1,2].map(n => <div key={n} className={`race-lane ${lane === n ? 'selected-lane' : ''}`}><span className="road-line"/>{(drives * 7 + 2) % 3 === n && drives < 12 && <span className="obstacle">◆</span>}{lane === n && <span className="player-car">▲</span>}</div>)}</div><div className="control-row">{[0,1,2].map(n => <button key={n} className={lane === n ? 'answer-button chosen' : 'answer-button'} onClick={() => setLane(n)}>Lane {n+1}</button>)}</div><button className="primary-game-button" onClick={drive} disabled={drives >= 12}>Drive forward</button><p className="hint">{12-drives} track sections remaining</p></div>}
+    {gameId === 'racer' && <div className="race-board"><p className="game-instruction">Switch lanes to avoid the next obstacle, then drive forward.</p><div className="road">{[0,1,2].map(n => <div key={n} className={`race-lane ${lane === n ? 'selected-lane' : ''}`}><span className="road-line"/>{(drives * 7 + level * 2) % 3 === n && drives < 12 && <span className="obstacle">◆</span>}{lane === n && <span className="player-car">▲</span>}</div>)}</div><div className="control-row">{[0,1,2].map(n => <button key={n} className={lane === n ? 'answer-button chosen' : 'answer-button'} onClick={() => setLane(n)}>Lane {n+1}</button>)}</div><button className="primary-game-button" onClick={drive} disabled={drives >= 12}>Drive forward</button><p className="hint">{raceTarget-drives} track sections remaining</p></div>}
     {gameId === 'quest' && <div className="quest-area"><p className="game-instruction">Explore the map, collect five crystals, and reach the gate at the top-right.</p><div className="quest-grid">{mapCells.map(cell => <div key={cell.key} className={`quest-cell ${cell.gem && !gems.includes(cell.key) ? 'crystal' : ''} ${cell.gate ? 'gate' : ''} `}>{position.x === cell.x && position.y === cell.y ? 'P' : cell.gate ? 'G' : cell.gem && !gems.includes(cell.key) ? '✦' : ''}</div>)}</div><div className="direction-pad"><ActionButton label="Move up" onClick={() => move(0,-1)}><ArrowUp/></ActionButton><div><ActionButton label="Move left" onClick={() => move(-1,0)}><ArrowLeft/></ActionButton><ActionButton label="Move down" onClick={() => move(0,1)}><ArrowDown/></ActionButton><ActionButton label="Move right" onClick={() => move(1,0)}><ArrowRight/></ActionButton></div></div><p className="hint">Keyboard: arrow keys or WASD. Player starts at bottom-left.</p></div>}
     {gameId === 'builder' && <div className="builder-area"><p className="game-instruction">Create a pattern or picture. Select a tile, then tap the board to paint.</p><div className="palette">{['violet','blue','orange','green','pink','teal',''].map(color => <button key={color || 'erase'} className={`palette-swatch ${color} ${paint === color ? 'chosen' : ''}`} onClick={() => setPaint(color)} aria-label={color || 'Erase'}>{color ? '' : '×'}</button>)}</div><div className="builder-grid">{tiles.map((tile, i) => <button key={i} className={`builder-tile ${tile}`} onClick={() => setTiles(current => current.map((v, n) => n === i ? paint : v))} aria-label={`Paint tile ${i+1}`}/>)}</div><div className="game-actions"><span className="hint">Your design stays in this session.</span><button className="secondary-button" onClick={() => setTiles(Array(64).fill(''))}><RotateCcw size={15}/> Clear board</button></div></div>}
-    {gameId === 'sports' && <div className="sports-area"><p className="game-instruction">Penalty shootout! Choose one of five goal zones. Avoid the goalkeeper.</p><div className="goal-frame"><div className="goal-net">{[0,1,2,3,4].map(n => <button key={n} className="goal-zone" onClick={() => shoot(n)} disabled={shots >= 5}>Shoot</button>)}</div><span className="keeper">KEEPER</span></div><p className="game-feedback">{lastShot || 'Pick your target.'}</p><p className="hint">Five shots. How many goals can you score?</p></div>}
+    {gameId === 'sports' && <div className="sports-area"><p className="game-instruction">Penalty shootout! Choose one of five goal zones. Avoid the goalkeeper.</p><div className="goal-frame"><div className="goal-net">{[0,1,2,3,4].map(n => <button key={n} className="goal-zone" onClick={() => shoot(n)} disabled={shots >= 5}>Shoot</button>)}</div><span className="keeper">KEEPER</span></div><p className="game-feedback">{lastShot || 'Pick your target.'}</p><p className="hint">{shotTarget} shots. How many goals can you score?</p></div>}
     {gameId === 'space' && <div className="challenge-box"><span className="eyebrow">SPACE SCIENCE QUIZ</span><h3>{science.q}</h3><p>{message}</p><div className="answer-grid">{science.options.map(option => <button key={option} className="answer-button" onClick={() => chooseScience(option)} disabled={complete}>{option}</button>)}</div><p className="hint">Question {Math.min(scienceIndex+1, questionBank.length)} of {questionBank.length}</p></div>}
     {done && <div className="win-message"><Trophy/> Challenge complete! You earned stars for your effort.</div>}
     {gameId === 'builder' && <p className="builder-note">Creative mode is open-ended — finish when you are happy with your design.</p>}
