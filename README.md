@@ -8,16 +8,19 @@ KidVersa is a privacy-first games platform in development for children aged **9�
 
 ### Playable game experiences
 - **Memory Galaxy** — match six pairs; move counter and completion reward.
-- **Number Dash** — eight arithmetic questions with generated answer choices.
-- **Speed Racers** — three-lane obstacle-dodging arcade challenge.
+- **Number Dash** — arithmetic rounds scale from 8 to 20 questions with level-based number ranges.
+- **Speed Racers** — three-lane obstacle-dodging challenge scales from 12 to 30 track sections.
 - **Adventure Quest** — grid exploration, crystal collection, and keyboard/touch movement.
 - **Creative Builder** — 8×8 tile-based pixel-art canvas with a colour palette.
-- **Sports Arena** — five-shot penalty challenge.
+- **Sports Arena** — penalty challenge scales from 5 to 10 shots.
 - **Space Explorer** — short science and general-knowledge quiz.
 
 ### Game hub
 - Responsive game library with search and category filters.
 - Touch-friendly controls and keyboard movement in Adventure Quest.
+- Ten-level local progression per game, with difficulty scaling in maths, racing, and sports.
+- Local accessibility preferences: larger text, higher contrast, and reduced motion.
+- Responsive visual system with progress indicators, level badges, visible keyboard focus, and larger interactive controls.
 - Local star count saved in browser storage.
 - Installable web-app manifest and basic service-worker shell caching.
 - Capacitor configuration for packaging the web app as an Android project.
@@ -90,3 +93,13 @@ The repository includes an automated TypeScript/production-build workflow. A gre
 ## Ownership
 
 PCMDK369™ — https://www.pcmdk369.com/
+
+
+## UX and child-safety research references
+
+The design implementation uses these public guidance sources as a baseline, not as a certification:
+- [Google for Developers — Designing engaging apps for kids](https://developers.google.com/building-for-kids/designing-engaging-apps): predictable navigation, simple interactions, and large touch targets.
+- [W3C — Web Content Accessibility Guidelines (WCAG) 2.2](https://www.w3.org/TR/wcag/): contrast, keyboard operation, focus visibility, target sizing, and reduced barriers.
+- [Google Play — Families Policy](https://support.google.com/googleplay/android-developer/answer/9893335): child-appropriate content, privacy disclosures, SDK and advertising requirements.
+
+These references should be rechecked during release review because platform policies can change.
