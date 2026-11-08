@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { ArrowLeft, ArrowRight, Gauge, Pause, Play, RotateCcw, Trophy, X, Zap } from 'lucide-react';
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Gauge, Pause, Play, RotateCcw, Trophy, X, Zap } from 'lucide-react';
+import './race3d.css';
 
 type Props = { level: number; onClose: () => void; onReward: (amount: number) => void };
 type CarKind = 'sport' | 'super' | 'kart' | 'monster';
@@ -101,15 +102,18 @@ export default function Race3DGame({ level, onClose, onReward }: Props) {
   const [finished, setFinished] = useState(false);
   const [rewarded, setRewarded] = useState(false);
   const [boosting, setBoosting] = useState(false);
+  const [accelerating, setAccelerating] = useState(false);
+  const [braking, setBraking] = useState(false);
   const [status, setStatus] = useState('Pick your car and world, then start your race.');
   const target = mode === 'time' ? 500 : mode === 'championship' ? 1800 : 1000;
   const onDistance = (value: number) => { setDistance(value); if (value >= target && !finished) { setFinished(true); setPaused(true); setStatus('Finish line! Brilliant driving.'); if (!rewarded) { setRewarded(true); onReward(12 + Math.min(8, Math.floor(level / 2))); } } };
   const onCrash = () => { setCrashes(value => value + 1); setSpeed(value => Math.max(28, value - 7)); setStatus('Bump! Keep steering and get back on track.'); };
-  useEffect(() => { if (started && !paused && !finished) { const id = window.setInterval(() => { setSpeed(value => Math.min(boosting ? 104 : 76, value + 0.8)); setNitro(value => Math.min(100, value + 1.2)); }, 500); return () => window.clearInterval(id); } }, [started, paused, finished, boosting]);
+  useEffect(() => { if (started && !paused && !finished) { const id = window.setInterval(() => { if (boosting && nitro > 0) { setSpeed(108); setNitro(value => Math.max(0, value - 2.8)); } else if (accelerating) setSpeed(value => Math.min(88, value + 2.2)); else if (braking) setSpeed(value => Math.max(25, value - 3.2)); else { setSpeed(value => Math.max(42, value - 0.45)); setNitro(value => Math.min(100, value + 1.1)); } }, 100); return () => window.clearInterval(id); } }, [started, paused, finished, boosting, accelerating, braking, nitro]);
+  useEffect(() => { const down = (event: KeyboardEvent) => { if (!started || paused || finished) return; if (['ArrowLeft','ArrowRight','ArrowUp','ArrowDown',' '].includes(event.key)) event.preventDefault(); if (event.key === 'ArrowLeft' || event.key.toLowerCase() === 'a') changeLane(-1); if (event.key === 'ArrowRight' || event.key.toLowerCase() === 'd') changeLane(1); if (event.key === 'ArrowUp' || event.key.toLowerCase() === 'w') setAccelerating(true); if (event.key === 'ArrowDown' || event.key.toLowerCase() === 's') setBraking(true); if (event.key === ' ') boostStart(); }; const up = (event: KeyboardEvent) => { if (event.key === 'ArrowUp' || event.key.toLowerCase() === 'w') setAccelerating(false); if (event.key === 'ArrowDown' || event.key.toLowerCase() === 's') setBraking(false); if (event.key === ' ') boostStop(); }; window.addEventListener('keydown', down); window.addEventListener('keyup', up); return () => { window.removeEventListener('keydown', down); window.removeEventListener('keyup', up); }; }, [started, paused, finished, nitro]);
   const changeLane = (direction: number) => setLane(value => Math.max(0, Math.min(2, value + direction)));
-  const boostStart = () => { if (nitro > 4 && started && !paused && !finished) { setBoosting(true); setSpeed(104); setNitro(value => Math.max(0, value - 4)); } };
+  const boostStart = () => { if (nitro > 4 && started && !paused && !finished) setBoosting(true); };
   const boostStop = () => setBoosting(false);
-  const restart = () => { setLane(1); setDistance(0); setCrashes(0); setSpeed(54); setNitro(100); setStarted(false); setPaused(false); setFinished(false); setRewarded(false); setBoosting(false); setStatus('Ready for another race.'); };
+  const restart = () => { setLane(1); setDistance(0); setCrashes(0); setSpeed(54); setNitro(100); setStarted(false); setPaused(false); setFinished(false); setRewarded(false); setBoosting(false); setAccelerating(false); setBraking(false); setStatus('Ready for another race.'); };
   const progress = Math.min(100, distance / target * 100);
   return <div className="game-overlay race3d-overlay"><section className="race3d-panel">
     <header className="race3d-header"><div><span className="eyebrow">KIDVERSA 3D RACING WORLD · LEVEL {level}</span><h2>Turbo Track Legends</h2><p>Race smart, dodge safely, and collect your next star.</p></div><button className="icon-button" onClick={onClose} aria-label="Close 3D race"><X /></button></header>
@@ -130,7 +134,7 @@ export default function Race3DGame({ level, onClose, onReward }: Props) {
       {finished && <div className="race3d-finish"><Trophy size={34}/><strong>Race complete!</strong><p>You earned {12 + Math.min(8, Math.floor(level / 2))} stars. Great driving!</p><button className="primary-game-button" onClick={restart}><RotateCcw size={16}/> Race again</button></div>}
     </div>
     <div className="race3d-bottom"><div className="race3d-stats"><span>Rival bumps <b>{crashes}</b></span><span>Race progress <b>{Math.round(progress)}%</b></span><span>{status}</span></div>
-      <div className="race3d-controls"><button className="race-steer" onClick={() => changeLane(-1)} aria-label="Steer left" disabled={!started || paused || finished}><ArrowLeft/></button><button className="race-steer" onClick={() => changeLane(1)} aria-label="Steer right" disabled={!started || paused || finished}><ArrowRight/></button><button className="race-action" onClick={() => { if (started && !finished) setPaused(value => !value); }} disabled={!started || finished}><Pause size={17}/>{paused ? 'Resume' : 'Pause'}</button><button className="race-nitro" onPointerDown={boostStart} onPointerUp={boostStop} onPointerLeave={boostStop} onContextMenu={e => e.preventDefault()} disabled={!started || paused || finished || nitro < 5}><Zap size={17}/> Nitro</button></div>
+      <div className="race3d-controls"><button className="race-steer" onClick={() => changeLane(-1)} aria-label="Steer left" disabled={!started || paused || finished}><ArrowLeft/></button><button className="race-steer" onClick={() => changeLane(1)} aria-label="Steer right" disabled={!started || paused || finished}><ArrowRight/></button><button className="race-accelerate" onPointerDown={() => setAccelerating(true)} onPointerUp={() => setAccelerating(false)} onPointerLeave={() => setAccelerating(false)} onPointerCancel={() => setAccelerating(false)} disabled={!started || paused || finished}><ArrowUp size={17}/> Gas</button><button className="race-brake" onPointerDown={() => setBraking(true)} onPointerUp={() => setBraking(false)} onPointerLeave={() => setBraking(false)} onPointerCancel={() => setBraking(false)} disabled={!started || paused || finished}><ArrowDown size={17}/> Brake</button><button className="race-action" onClick={() => { if (started && !finished) setPaused(value => !value); }} disabled={!started || finished}><Pause size={17}/>{paused ? 'Resume' : 'Pause'}</button><button className="race-nitro" onPointerDown={boostStart} onPointerUp={boostStop} onPointerLeave={boostStop} onContextMenu={e => e.preventDefault()} disabled={!started || paused || finished || nitro < 5}><Zap size={17}/> Nitro</button></div>
     </div>
     <p className="race3d-note">Kid-safe arcade racing · No purchases · Progress stays on this device</p>
   </section></div>;
