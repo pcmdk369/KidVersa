@@ -102,6 +102,7 @@ export default function Race3DGame({ level, onClose, onReward }: Props) {
   const [finished, setFinished] = useState(false);
   const [rewarded, setRewarded] = useState(false);
   const [boosting, setBoosting] = useState(false);
+  const [runId, setRunId] = useState(0);
   const [accelerating, setAccelerating] = useState(false);
   const [braking, setBraking] = useState(false);
   const [status, setStatus] = useState('Pick your car and world, then start your race.');
@@ -113,7 +114,7 @@ export default function Race3DGame({ level, onClose, onReward }: Props) {
   const changeLane = (direction: number) => setLane(value => Math.max(0, Math.min(2, value + direction)));
   const boostStart = () => { if (nitro > 4 && started && !paused && !finished) setBoosting(true); };
   const boostStop = () => setBoosting(false);
-  const restart = () => { setLane(1); setDistance(0); setCrashes(0); setSpeed(54); setNitro(100); setStarted(false); setPaused(false); setFinished(false); setRewarded(false); setBoosting(false); setAccelerating(false); setBraking(false); setStatus('Ready for another race.'); };
+  const restart = () => { setLane(1); setDistance(0); setCrashes(0); setSpeed(54); setNitro(100); setStarted(false); setPaused(false); setFinished(false); setRewarded(false); setBoosting(false); setAccelerating(false); setBraking(false); setRunId(value => value + 1); setStatus('Ready for another race.'); };
   const progress = Math.min(100, distance / target * 100);
   return <div className="game-overlay race3d-overlay"><section className="race3d-panel">
     <header className="race3d-header"><div><span className="eyebrow">KIDVERSA 3D RACING WORLD · LEVEL {level}</span><h2>Turbo Track Legends</h2><p>Race smart, dodge safely, and collect your next star.</p></div><button className="icon-button" onClick={onClose} aria-label="Close 3D race"><X /></button></header>
@@ -125,7 +126,7 @@ export default function Race3DGame({ level, onClose, onReward }: Props) {
     </div>
     <div className="race3d-stage">
       <Canvas shadows dpr={[1, 1.5]} camera={{ position: [0, 6.4, 11.5], fov: 48 }} gl={{ antialias: false, powerPreference: 'high-performance' }}>
-        <TrackWorld lane={lane} color={paint} kind={car} world={world} speed={speed} paused={!started || paused || finished} onCrash={onCrash} onDistance={onDistance} />
+        <TrackWorld key={runId} lane={lane} color={paint} kind={car} world={world} speed={speed} paused={!started || paused || finished} onCrash={onCrash} onDistance={onDistance} />
       </Canvas>
       <div className="race3d-hud"><span><Gauge size={15}/> {Math.round(speed)} km/h</span><span><Zap size={15}/> Nitro {Math.round(nitro)}%</span><span>Distance {Math.round(distance)} / {target} m</span></div>
       <div className="race3d-progress"><i style={{ width: progress + '%' }} /></div>
