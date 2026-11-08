@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, RotateCcw, Trophy, X } from 'lucide-react';
 
-type Props = { gameId: string; onClose: () => void; onReward: (amount: number) => void };
+type Props = { gameId: string; level: number; onClose: () => void; onReward: (amount: number) => void };
 type Question = { prompt: string; answer: number; choices: number[] };
 const questionBank = [
   { q: 'Which planet is known as the Red Planet?', a: 'Mars', options: ['Venus', 'Mars', 'Jupiter', 'Mercury'] },
@@ -23,7 +23,7 @@ function makeQuestion(): Question {
 function ActionButton({ children, onClick, label }: { children: ReactNode; onClick: () => void; label: string }) {
   return <button className="play-control" onClick={onClick} aria-label={label}>{children}</button>;
 }
-export default function GameRoom({ gameId, onClose, onReward }: Props) {
+export default function GameRoom({ gameId, level, onClose, onReward }: Props) {
   const [round, setRound] = useState(0);
   const [score, setScore] = useState(0);
   const [complete, setComplete] = useState(false);
@@ -146,8 +146,8 @@ export default function GameRoom({ gameId, onClose, onReward }: Props) {
   }), []);
   const science = questionBank[scienceIndex % questionBank.length];
   return <div className="game-overlay"><section className="game-panel game-panel-wide">
-    <div className="game-top"><div><span className="eyebrow">KIDVERSA GAME WORLD</span><h2>{titles[gameId] ?? 'Game'}</h2><p>Play at your own pace. No countdowns or purchases.</p></div><button className="icon-button" onClick={onClose} aria-label="Close game"><X /></button></div>
-    <div className="game-stats"><span>Score <b>{score}</b></span><span>Round <b>{gameId === 'memory' ? moves : gameId === 'racer' ? drives : gameId === 'sports' ? shots : gameId === 'space' ? scienceIndex : round}</b></span><span>{gameId === 'quest' ? 'Crystals' : gameId === 'sports' ? 'Goals' : 'Best effort'} <b>{gameId === 'quest' ? gems.length : gameId === 'sports' ? goals : gameId === 'racer' ? hits + ' bumps' : 'Keep going'}</b></span></div>
+    <div className="game-top"><div><span className="eyebrow">KIDVERSA GAME WORLD · LEVEL {level}</span><h2>{titles[gameId] ?? 'Game'}</h2><p>Play at your own pace. No countdowns or purchases.</p></div><button className="icon-button" onClick={onClose} aria-label="Close game"><X /></button></div>
+    <div className="level-track"><div><span>LEVEL {level}</span><b>{Math.min(100, (level - 1) * 11)}% progress</b></div><div className="level-track-bar"><i style={{width: `${Math.min(100, (level - 1) * 11)}%`}}/></div></div><div className="game-stats"><span>Score <b>{score}</b></span><span>Round <b>{gameId === 'memory' ? moves : gameId === 'racer' ? drives : gameId === 'sports' ? shots : gameId === 'space' ? scienceIndex : round}</b></span><span>{gameId === 'quest' ? 'Crystals' : gameId === 'sports' ? 'Goals' : 'Best effort'} <b>{gameId === 'quest' ? gems.length : gameId === 'sports' ? goals : gameId === 'racer' ? hits + ' bumps' : 'Keep going'}</b></span></div>
     {gameId === 'memory' && <><p className="game-instruction">Match all six pairs. Remember where each symbol is hiding.</p><div className="memory-grid">{cards.map(card => { const visible = card.matched || picked.includes(card.id); return <button key={card.id} className={`memory-card ${visible ? 'revealed' : ''} ${card.matched ? 'matched' : ''}`} onClick={() => flip(card.id)} aria-label={visible ? card.symbol : 'Hidden card'}>{visible ? card.symbol : '?'}</button>; })}</div></>}
     {gameId === 'number' && <div className="challenge-box"><span className="eyebrow">MATH CHALLENGE</span><h3>{question.prompt}</h3><p>{message}</p><div className="answer-grid">{question.choices.map(n => <button key={n} className="answer-button" onClick={() => answerMath(n)} disabled={complete}>{n}</button>)}</div></div>}
     {gameId === 'racer' && <div className="race-board"><p className="game-instruction">Switch lanes to avoid the next obstacle, then drive forward.</p><div className="road">{[0,1,2].map(n => <div key={n} className={`race-lane ${lane === n ? 'selected-lane' : ''}`}><span className="road-line"/>{(drives * 7 + 2) % 3 === n && drives < 12 && <span className="obstacle">◆</span>}{lane === n && <span className="player-car">▲</span>}</div>)}</div><div className="control-row">{[0,1,2].map(n => <button key={n} className={lane === n ? 'answer-button chosen' : 'answer-button'} onClick={() => setLane(n)}>Lane {n+1}</button>)}</div><button className="primary-game-button" onClick={drive} disabled={drives >= 12}>Drive forward</button><p className="hint">{12-drives} track sections remaining</p></div>}
