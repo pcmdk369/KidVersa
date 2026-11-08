@@ -6,10 +6,24 @@ KidVersa is a privacy-first games platform in development for children aged **9�
 
 ## Current implementation
 
-### Playable game experiences
+### Flagship 3D racing experience — Turbo Track Legends
+
+- Built with **Three.js + React Three Fiber** on React 19.
+- Real-time 3D scene with modeled player vehicles, rival traffic, moving road markings, roadside scenery, lighting, fog, and themed environments.
+- Four vehicle classes: Street Racer, Hyper GT (level 3), Turbo Kart (level 2), and Monster Truck (level 5); six paint colours.
+- Five selectable environments: Neon City, Sunset Desert, Emerald Forest, Cloud Peaks, and Sunny Coast.
+- Three race modes: Quick Race, Championship distance, and Time Trial distance.
+- Three-lane steering, acceleration, braking, arcade drifting, nitro boost, rival-car collision feedback, pause/resume, race restart, and finish rewards.
+- Upgrade tuning presets: Balanced, Speed Engine, Grip Handling, and Nitro Efficiency.
+- Keyboard support (arrow keys / WASD / Space) and large touch-friendly mobile controls.
+- Procedurally synthesized optional engine tone, ambient music layer, nitro, collision, and victory effects. Sound can be muted.
+- Local level and star rewards use the existing KidVersa progress system. No account, cloud profile, purchases, ads, or public chat are added by the racing game.
+- Mobile performance settings: capped device pixel ratio, disabled expensive antialiasing, compact geometry, and responsive touch UI.
+
+### Other playable game experiences
 - **Memory Galaxy** — match six to fifteen pairs as levels advance; move counter and completion reward.
 - **Number Dash** — arithmetic rounds scale from 8 to 20 questions with level-based number ranges.
-- **Speed Racers** — three-lane obstacle-dodging challenge scales from 12 to 30 track sections.
+- **Speed Racers** — lightweight three-lane obstacle-dodging challenge scales from 12 to 30 track sections.
 - **Adventure Quest** — grid exploration, crystal collection, and keyboard/touch movement.
 - **Creative Builder** — 8×8 tile-based pixel-art canvas with a colour palette.
 - **Sports Arena** — penalty challenge scales from 5 to 10 shots.
@@ -28,11 +42,24 @@ KidVersa is a privacy-first games platform in development for children aged **9�
 - GitHub Actions build workflow.
 
 ## Technology
-- React + TypeScript
+- React 19 + TypeScript
 - Vite
+- Three.js + React Three Fiber (3D racing)
 - Lucide icons
 - Capacitor 7 (Android wrapper)
 - Browser localStorage for simple local progress
+
+## 3D racing controls
+
+| Action | Keyboard | Touch |
+|---|---|---|
+| Steer left / right | Left / Right or A / D | Left / right arrows |
+| Accelerate | Up or W | Hold Gas |
+| Brake | Down or S | Hold Brake |
+| Nitro | Space | Hold Nitro |
+| Pause / resume | — | Pause button |
+
+Choose the race mode, environment, car type, and paint before starting. The selected setup is locked during a race to keep the run consistent. Use Restart to begin a fresh run.
 
 ## Run locally
 
@@ -79,7 +106,7 @@ Build and test the APK from Android Studio. The Android project is generated loc
 - A basic arithmetic parent gate is a convenience screen only, not secure adult verification or a device-level restriction.
 - Do not enter a child's real name, contact details, school, or other personal information.
 
-**Important:** These are product design intentions, not a legal certification or a guarantee of regulatory compliance. Before release, complete a child-privacy review, accessibility review, security assessment, parental-consent analysis where applicable, and age-appropriate usability testing. The current parent area only offers local session-length settings and local star reset. Secure parent authentication, enforceable screen-time controls, identity, remote data protection, and cloud sync are not implemented.
+**Important:** These are product design intentions, not a legal certification or a guarantee of regulatory compliance. Before release, complete a child-privacy review, accessibility review, security assessment, parental-consent analysis where applicable, and age-appropriate usability testing. The current parent area only offers local session-length settings and local star reset. Secure parent authentication, enforceable screen-time controls, identity, remote data protection, and cloud sync are not implemented. The 3D racing game is a local single-player arcade prototype; its rival vehicles are simulated traffic, not networked multiplayer opponents.
 
 ## Quality status
 
@@ -87,7 +114,8 @@ The repository includes an automated TypeScript/production-build workflow. A gre
 
 ## Roadmap
 - Automated unit and end-to-end tests for all games.
-- More levels, progression, achievements, and accessible difficulty options.
+- Expand 3D racing with real track layouts, lap timing, drifting physics, vehicle upgrades, unlock conditions, and additional AI racing strategies.
+- Add more levels, progression, achievements, and accessible difficulty options.
 - Parent dashboard with robust adult verification and enforceable session settings.
 - Server-authoritative multiplayer rooms with child-safe matchmaking and no open chat.
 - Secure parent accounts, parental consent, data minimisation, account recovery, and audited access controls.

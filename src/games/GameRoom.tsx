@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, RotateCcw, Trophy, X } from 'lucide-react';
+import Race3DGame from './Race3DGame';
 
 type Props = { gameId: string; level: number; onClose: () => void; onReward: (amount: number) => void };
 type Question = { prompt: string; answer: number; choices: number[] };
@@ -11,7 +12,7 @@ const questionBank = [
   { q: 'How many minutes are in one hour?', a: '60', options: ['30', '45', '60', '90'] },
 ];
 const titles: Record<string, string> = {
-  memory: 'Memory Galaxy', number: 'Number Dash', racer: 'Speed Racers',
+  memory: 'Memory Galaxy', number: 'Number Dash', racer: 'Speed Racers', racer3d: 'Turbo Track Legends',
   quest: 'Adventure Quest', builder: 'Creative Builder', sports: 'Sports Arena', space: 'Space Explorer',
 };
 const memorySymbols = ['SUN','MOON','STAR','RAINBOW','LEAF','PLANET','COMET','CLOUD','FLOWER','OCEAN','HEART','LIGHTNING','MOUNTAIN','SNOWFLAKE','GALAXY'];
@@ -29,6 +30,7 @@ function ActionButton({ children, onClick, label }: { children: ReactNode; onCli
   return <button className="play-control" onClick={onClick} aria-label={label}>{children}</button>;
 }
 export default function GameRoom({ gameId, level, onClose, onReward }: Props) {
+  if (gameId === 'racer3d') return <Race3DGame level={level} onClose={onClose} onReward={onReward} />;
   const [round, setRound] = useState(0);
   const [score, setScore] = useState(0);
   const [complete, setComplete] = useState(false);
