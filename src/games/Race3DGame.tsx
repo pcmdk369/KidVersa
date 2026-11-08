@@ -9,6 +9,7 @@ type Props = { level: number; onClose: () => void; onReward: (amount: number) =>
 type CarKind = 'sport' | 'super' | 'kart' | 'monster';
 type WorldKind = 'city' | 'desert' | 'forest' | 'mountain' | 'beach';
 type RaceMode = 'quick' | 'championship' | 'time';
+type Upgrade = 'balanced' | 'speed' | 'grip' | 'nitro';
 const laneX = [-2.25, 0, 2.25];
 const palettes: Record<WorldKind, { sky: string; ground: string; road: string; accent: string; label: string }> = {
   city: { sky: '#9bc8ed', ground: '#7896a4', road: '#303747', accent: '#f6c85f', label: 'Neon City' },
@@ -93,6 +94,7 @@ export default function Race3DGame({ level, onClose, onReward }: Props) {
   const [car, setCar] = useState<CarKind>('sport');
   const [world, setWorld] = useState<WorldKind>('city');
   const [mode, setMode] = useState<RaceMode>('quick');
+  const [upgrade, setUpgrade] = useState<Upgrade>('balanced');
   const [paint, setPaint] = useState('#ff6b4a');
   const [speed, setSpeed] = useState(54);
   const [nitro, setNitro] = useState(100);
@@ -111,12 +113,12 @@ export default function Race3DGame({ level, onClose, onReward }: Props) {
   const [status, setStatus] = useState('Pick your car and world, then start your race.');
   const target = mode === 'time' ? 500 : mode === 'championship' ? 1800 : 1000;
   const onDistance = (value: number) => { setDistance(value); if (value >= target && !finished) { setFinished(true); setPaused(true); setStatus('Finish line! Brilliant driving.'); if (soundOn) playRaceEffect('finish'); if (!rewarded) { setRewarded(true); onReward(12 + Math.min(8, Math.floor(level / 2))); } } };
-  const onCrash = () => { setCrashes(value => value + 1); setSpeed(value => Math.max(28, value - 7)); setStatus('Bump! Keep steering and get back on track.'); if (soundOn) playRaceEffect('crash'); };
+  const onCrash = () => { setCrashes(value => value + 1); setSpeed(value => Math.max(28, value - (upgrade === 'grip' ? 3 : 7))); setStatus('Bump! Keep steering and get back on track.'); if (soundOn) playRaceEffect('crash'); };
   useEffect(() => { if (soundOn && started && !paused && !finished) { startRaceAudio(); updateRaceAudio(speed); } else stopRaceAudio(); return () => { if (!started || paused || finished || !soundOn) stopRaceAudio(); }; }, [soundOn, started, paused, finished]);
   useEffect(() => { updateRaceAudio(speed); }, [speed]);
   useEffect(() => { localStorage.setItem('kidversa-race-sound', String(soundOn)); }, [soundOn]);
   useEffect(() => () => stopRaceAudio(), []);
-  useEffect(() => { if (started && !paused && !finished) { const id = window.setInterval(() => { if (boosting && nitro > 0) { setSpeed(108); setNitro(value => Math.max(0, value - 2.8)); } else if (accelerating) setSpeed(value => Math.min(88, value + 2.2)); else if (braking) setSpeed(value => Math.max(25, value - 3.2)); else { setSpeed(value => Math.max(42, value - 0.45)); setNitro(value => Math.min(100, value + 1.1)); } }, 100); return () => window.clearInterval(id); } }, [started, paused, finished, boosting, accelerating, braking, nitro]);
+  useEffect(() => { if (started && !paused && !finished) { const id = window.setInterval(() => { if (boosting && nitro > 0) { setSpeed(108); setNitro(value => Math.max(0, value - (upgrade === 'nitro' ? 1.7 : 2.8))); } else if (accelerating) setSpeed(value => Math.min(upgrade === 'speed' ? 98 : 88, value + (upgrade === 'speed' ? 3 : 2.2))); else if (braking) setSpeed(value => Math.max(25, value - 3.2)); else { setSpeed(value => Math.max(42, value - 0.45)); setNitro(value => Math.min(100, value + 1.1)); } }, 100); return () => window.clearInterval(id); } }, [started, paused, finished, boosting, accelerating, braking, nitro, upgrade]);
   useEffect(() => { const down = (event: KeyboardEvent) => { if (!started || paused || finished) return; if (['ArrowLeft','ArrowRight','ArrowUp','ArrowDown',' '].includes(event.key)) event.preventDefault(); if (event.key === 'ArrowLeft' || event.key.toLowerCase() === 'a') changeLane(-1); if (event.key === 'ArrowRight' || event.key.toLowerCase() === 'd') changeLane(1); if (event.key === 'ArrowUp' || event.key.toLowerCase() === 'w') setAccelerating(true); if (event.key === 'ArrowDown' || event.key.toLowerCase() === 's') setBraking(true); if (event.key === ' ') boostStart(); }; const up = (event: KeyboardEvent) => { if (event.key === 'ArrowUp' || event.key.toLowerCase() === 'w') setAccelerating(false); if (event.key === 'ArrowDown' || event.key.toLowerCase() === 's') setBraking(false); if (event.key === ' ') boostStop(); }; window.addEventListener('keydown', down); window.addEventListener('keyup', up); return () => { window.removeEventListener('keydown', down); window.removeEventListener('keyup', up); }; }, [started, paused, finished, nitro]);
   const changeLane = (direction: number) => setLane(value => Math.max(0, Math.min(2, value + direction)));
   const boostStart = () => { if (nitro > 4 && started && !paused && !finished) { setBoosting(true); if (soundOn) playRaceEffect('boost'); } };
@@ -130,6 +132,7 @@ export default function Race3DGame({ level, onClose, onReward }: Props) {
       <label>Race mode<select value={mode} onChange={e => setMode(e.target.value as RaceMode)} disabled={started}><option value="quick">Quick Race</option><option value="championship">Championship</option><option value="time">Time Trial</option></select></label>
       <label>World<select value={world} onChange={e => setWorld(e.target.value as WorldKind)} disabled={started}>{(Object.keys(palettes) as WorldKind[]).map(key => <option key={key} value={key}>{palettes[key].label}</option>)}</select></label>
       <label>Car<select value={car} onChange={e => setCar(e.target.value as CarKind)} disabled={started}>{(Object.keys(carNames) as CarKind[]).map(key => <option key={key} value={key} disabled={(key === 'kart' && level < 2) || (key === 'super' && level < 3) || (key === 'monster' && level < 5)}>{carNames[key]}{(key === 'kart' && level < 2) ? ' · Level 2' : (key === 'super' && level < 3) ? ' · Level 3' : (key === 'monster' && level < 5) ? ' · Level 5' : ''}</option>)}</select></label>
+      <label>Upgrade<select value={upgrade} onChange={e => setUpgrade(e.target.value as Upgrade)} disabled={started}><option value="balanced">Balanced</option><option value="speed">Speed engine</option><option value="grip">Grip handling</option><option value="nitro">Nitro efficiency</option></select></label>
       <label>Paint<span className="paint-options">{['#ff6b4a','#39a7ff','#a78bfa','#f6c453','#35bd91','#202938'].map(value => <button key={value} aria-label={'Paint ' + value} className={paint === value ? 'paint-dot selected' : 'paint-dot'} style={{ background: value }} onClick={() => setPaint(value)} disabled={started} />)}</span></label>
     </div>
     <div className="race3d-stage">
