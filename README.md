@@ -20,6 +20,7 @@ KidVersa is a privacy-first games platform in development for children aged **9â
 - Touch-friendly controls and keyboard movement in Adventure Quest.
 - Ten-level local progression per game, with difficulty scaling in maths, racing, and sports.
 - Local accessibility preferences: larger text, higher contrast, and reduced motion.
+- Optional synthesized sound effects and a quiet ambient tone layer using the Web Audio API; audio is opt-in, locally controlled, and never recorded or uploaded.
 - Responsive visual system with progress indicators, level badges, visible keyboard focus, and larger interactive controls.
 - Local stars, per-game levels, accessibility preferences, session preferences, and Creative Builder artwork saved in browser storage.
 - Installable web-app manifest and basic service-worker shell caching.
@@ -65,7 +66,7 @@ npx cap sync android
 npx cap open android
 ```
 
-Build and test the APK from Android Studio. The Android project is generated locally by Capacitor; a signed release build, Play Console listing, privacy declarations, and device testing are still required before publication.
+Build and test the APK from Android Studio. The Android project is generated locally by Capacitor. The repository can build a signed Android App Bundle only after the owner configures the required private GitHub Actions signing secrets; never commit a keystore or passwords. Play Console listing, privacy declarations, and device testing are still required before publication.
 
 ## Privacy and child-safety principles
 
@@ -73,7 +74,8 @@ Build and test the APK from Android Studio. The Android project is generated loc
 - No location collection or sharing.
 - No targeted advertising or behavioural ad profiles.
 - No in-app purchases in the current prototype.
-- Local progress and a simple session-length setting are stored on the device; there is no account or cloud-sync backend in this version.
+- Local progress, display/audio preferences, and a simple session-length setting are stored on the device; there is no account or cloud-sync backend in this version.
+- Online multiplayer and secure parent accounts are not implemented. Do not expose child profiles, chat, matchmaking, or personal data until a server-side security, parental-consent, moderation, and privacy design is approved.
 - A basic arithmetic parent gate is a convenience screen only, not secure adult verification or a device-level restriction.
 - Do not enter a child's real name, contact details, school, or other personal information.
 
@@ -81,12 +83,14 @@ Build and test the APK from Android Studio. The Android project is generated loc
 
 ## Quality status
 
-The repository includes an automated TypeScript/production-build workflow. A green CI run and manual browser/Android test results must be checked before calling a build release-ready. This code has not yet been independently validated on physical Android devices.
+The repository includes an automated TypeScript/production-build workflow. A green CI run is necessary but not sufficient: manual browser/Android testing, signed release verification, and child-safety review remain mandatory. This code has not yet been independently validated on physical Android devices.
 
 ## Roadmap
 - Automated unit and end-to-end tests for all games.
 - More levels, progression, achievements, and accessible difficulty options.
 - Parent dashboard with robust adult verification and enforceable session settings.
+- Server-authoritative multiplayer rooms with child-safe matchmaking and no open chat.
+- Secure parent accounts, parental consent, data minimisation, account recovery, and audited access controls.
 - Optional secure account and cloud-save system only after privacy/security design.
 - Android accessibility, performance, offline, and release-signing validation.
 
