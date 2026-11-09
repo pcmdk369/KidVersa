@@ -23,20 +23,31 @@ const carNames: Record<CarKind, string> = { sport: 'Street Racer', super: 'Hyper
 function Vehicle({ color, kind, position, rotation = 0 }: { color: string; kind: CarKind; position: [number, number, number]; rotation?: number }) {
   const monster = kind === 'monster';
   const kart = kind === 'kart';
-  const bodyLength = kart ? 1.45 : monster ? 2.05 : kind === 'super' ? 2.15 : 1.9;
-  const wheelRadius = monster ? 0.39 : kart ? 0.2 : 0.27;
-  return <group position={position} rotation={[0, rotation, 0]} scale={monster ? [1.12, 1.22, 1.12] : kart ? [0.86, 0.78, 0.86] : [1, 1, 1]}>
-    <mesh position={[0, 0.48, 0]} castShadow><boxGeometry args={[1.22, 0.42, bodyLength]} /><meshStandardMaterial color={color} roughness={0.32} metalness={0.35} /></mesh>
-    <mesh position={[0, 0.79, -0.12]} castShadow><boxGeometry args={[0.88, 0.48, bodyLength * 0.42]} /><meshStandardMaterial color="#bfe8f6" metalness={0.2} roughness={0.16} /></mesh>
-    <mesh position={[0, 0.34, bodyLength * 0.43]}><boxGeometry args={[0.82, 0.12, 0.08]} /><meshStandardMaterial color="#fff2bd" emissive="#ffbd54" emissiveIntensity={0.7} /></mesh>
-    <mesh position={[0, 0.36, -bodyLength * 0.48]}><boxGeometry args={[0.82, 0.12, 0.08]} /><meshStandardMaterial color="#f05252" emissive="#b91c1c" emissiveIntensity={0.35} /></mesh>
-    {([-1, 1] as const).flatMap(side => [-1, 1].map(axle => <mesh key={side + ':' + axle} position={[side * (monster ? 0.69 : 0.65), wheelRadius, axle * bodyLength * 0.31]} rotation={[0, 0, Math.PI / 2]} castShadow><cylinderGeometry args={[wheelRadius, wheelRadius, monster ? 0.3 : 0.2, 16]} /><meshStandardMaterial color="#18202a" roughness={0.9} /></mesh>))}
-    {kind === 'super' && <mesh position={[0, 0.78, -bodyLength * 0.45]}><boxGeometry args={[1.35, 0.08, 0.18]} /><meshStandardMaterial color={color} /></mesh>}
-    {monster && <mesh position={[0, 0.9, -0.72]}><boxGeometry args={[1.45, 0.12, 0.18]} /><meshStandardMaterial color="#242b36" /></mesh>}
-    {kart && <mesh position={[0, 0.84, -0.35]}><boxGeometry args={[0.12, 0.35, 0.12]} /><meshStandardMaterial color="#222" /></mesh>}
+  const length = kart ? 1.55 : monster ? 2.2 : kind === 'super' ? 2.3 : 2.05;
+  const width = monster ? 1.55 : kart ? 1.12 : 1.28;
+  const wheelRadius = monster ? 0.43 : kart ? 0.22 : 0.29;
+  const rubber = '#101722';
+  const glass = '#8ddcf5';
+  return <group position={position} rotation={[0, rotation, 0]} scale={monster ? [1.12, 1.18, 1.12] : kart ? [0.9, 0.78, 0.9] : [1, 1, 1]}>
+    <mesh position={[0, 0.43, 0]} castShadow receiveShadow><boxGeometry args={[width, 0.34, length]} /><meshPhysicalMaterial color={color} metalness={0.62} roughness={0.24} clearcoat={0.9} clearcoatRoughness={0.18} /></mesh>
+    <mesh position={[0, 0.61, length * 0.08]} castShadow><boxGeometry args={[width * 0.88, 0.16, length * 0.42]} /><meshStandardMaterial color={color} metalness={0.45} roughness={0.3} /></mesh>
+    {!monster && !kart && <mesh position={[0, 0.84, -0.12]} castShadow><boxGeometry args={[width * 0.68, 0.48, length * 0.39]} /><meshPhysicalMaterial color={glass} metalness={0.28} roughness={0.12} transparent opacity={0.78} /></mesh>}
+    {kart && <mesh position={[0, 0.83, -0.2]}><cylinderGeometry args={[0.28, 0.28, 0.12, 16]} /><meshStandardMaterial color="#252b37" /></mesh>}
+    <mesh position={[0, 0.31, length * 0.49]}><boxGeometry args={[width * 0.72, 0.11, 0.08]} /><meshStandardMaterial color="#fff4c2" emissive="#ffdf8a" emissiveIntensity={2.2} /></mesh>
+    {[-1, 1].map(side => <mesh key={side} position={[side * width * 0.32, 0.34, length * 0.495]}><boxGeometry args={[0.16, 0.12, 0.06]} /><meshStandardMaterial color="#fff" emissive="#fff1c2" emissiveIntensity={2.8} /></mesh>)}
+    <mesh position={[0, 0.34, -length * 0.5]}><boxGeometry args={[width * 0.78, 0.1, 0.07]} /><meshStandardMaterial color="#ff344f" emissive="#ff173b" emissiveIntensity={1.6} /></mesh>
+    <mesh position={[0, 0.29, length * 0.505]}><boxGeometry args={[width * 0.48, 0.07, 0.045]} /><meshStandardMaterial color="#171e2a" metalness={0.4} /></mesh>
+    {([-1, 1] as const).flatMap(side => [-1, 1].map(axle => <group key={side + ':' + axle} position={[side * (width * 0.49), wheelRadius, axle * length * 0.32]}>
+      <mesh rotation={[0, 0, Math.PI / 2]} castShadow><cylinderGeometry args={[wheelRadius, wheelRadius, monster ? 0.34 : 0.22, 20]} /><meshStandardMaterial color={rubber} roughness={0.92} /></mesh>
+      <mesh rotation={[0, 0, Math.PI / 2]} position={[side * (monster ? 0.18 : 0.12), 0, 0]}><cylinderGeometry args={[wheelRadius * 0.56, wheelRadius * 0.56, 0.025, 16]} /><meshStandardMaterial color={monster ? '#f7bd42' : '#b8c5d7'} metalness={0.85} roughness={0.22} /></mesh>
+      <mesh rotation={[0, 0, Math.PI / 2]} position={[side * (monster ? 0.2 : 0.135), 0, 0]}><torusGeometry args={[wheelRadius * 0.34, 0.035, 6, 12]} /><meshStandardMaterial color={color} metalness={0.7} roughness={0.25} /></mesh>
+    </group>))}
+    {!kart && <mesh position={[0, 0.68, -length * 0.43]}><boxGeometry args={[width * 0.96, 0.08, 0.13]} /><meshStandardMaterial color={color} metalness={0.55} /></mesh>}
+    {kind === 'super' && <><mesh position={[0, 0.9, -length * 0.49]}><boxGeometry args={[width * 1.18, 0.08, 0.13]} /><meshStandardMaterial color={color} metalness={0.6} /></mesh><mesh position={[0, 0.79, -length * 0.47]}><boxGeometry args={[0.09, 0.2, 0.08]} /><meshStandardMaterial color="#202938" /></mesh></>}
+    {monster && <><mesh position={[0, 0.98, -0.75]}><boxGeometry args={[1.55, 0.13, 0.2]} /><meshStandardMaterial color="#202938" metalness={0.55} /></mesh><mesh position={[0, 0.18, 0]}><boxGeometry args={[1.25, 0.13, 1.7]} /><meshStandardMaterial color="#343d4c" /></mesh></>}
+    {kart && <><mesh position={[0, 0.85, -0.38]}><boxGeometry args={[0.12, 0.42, 0.12]} /><meshStandardMaterial color="#252b37" /></mesh><mesh position={[0, 0.49, -0.2]}><boxGeometry args={[0.72, 0.12, 0.22]} /><meshStandardMaterial color="#111827" /></mesh></>}
   </group>;
 }
-
 function TrackWorld({ lane, color, kind, world, speed, paused, drifting, onCrash, onDistance }: {
   lane: number; color: string; kind: CarKind; world: WorldKind; speed: number; paused: boolean; drifting: boolean;
   onCrash: () => void; onDistance: (distance: number) => void;
