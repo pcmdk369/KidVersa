@@ -56,6 +56,7 @@ function TrackWorld({ lane, color, kind, world, speed, paused, drifting, onCrash
   const stripes = useRef<THREE.Group>(null);
   const scenery = useRef<THREE.Group>(null);
   const traffic = useRef<THREE.Group>(null);
+  const player = useRef<THREE.Group>(null);
   const distance = useRef(0);
   const hitCooldown = useRef(0);
   const lastReport = useRef(0);
@@ -65,6 +66,13 @@ function TrackWorld({ lane, color, kind, world, speed, paused, drifting, onCrash
     if (paused) return;
     const step = Math.min(delta, 0.05) * speed * 0.32;
     distance.current += step;
+    if (player.current) {
+      const targetX = laneX[lane];
+      player.current.position.x = THREE.MathUtils.damp(player.current.position.x, targetX, 9, delta);
+      const steering = THREE.MathUtils.clamp((targetX - player.current.position.x) * -0.16, -0.2, 0.2);
+      player.current.rotation.z = THREE.MathUtils.damp(player.current.rotation.z, steering, 8, delta);
+      player.current.rotation.y = THREE.MathUtils.damp(player.current.rotation.y, drifting ? 0.18 : 0, 7, delta);
+    }
     if (stripes.current) stripes.current.children.forEach(child => { child.position.z += step; if (child.position.z > 8) child.position.z -= 80; });
     if (scenery.current) scenery.current.children.forEach(child => { child.position.z += step; if (child.position.z > 10) child.position.z -= 245; });
     if (traffic.current) traffic.current.children.forEach((child, i) => {
@@ -102,7 +110,7 @@ function TrackWorld({ lane, color, kind, world, speed, paused, drifting, onCrash
         : <><mesh position={[0, 1.1, 0]}><cylinderGeometry args={[0.13, 0.2, 2.2, 8]} /><meshStandardMaterial color="#76523a" /></mesh><mesh position={[0, 2.5, 0]}><coneGeometry args={[1.25, 2.6, 7]} /><meshStandardMaterial color={world === 'desert' ? '#58804c' : world === 'beach' ? '#4d9d73' : '#2e8058'} /></mesh></>}
     </group>)}</group>
     <group ref={traffic}>{cars.map((car, i) => <group key={i} position={[laneX[car.lane], 0, car.z]}><Vehicle color={car.color} kind={i % 3 === 0 ? 'kart' : 'sport'} position={[0, 0, 0]} rotation={Math.PI} /></group>)}</group>
-    <Vehicle color={color} kind={kind} position={[laneX[lane], 0, 3.3]} rotation={drifting ? 0.18 : 0} />
+    <group ref={player} position={[laneX[lane], 0, 3.3]}><Vehicle color={color} kind={kind} position={[0, 0, 0]} /></group>
     <mesh position={[0, 0.02, 7]}><boxGeometry args={[8.2, 0.04, 0.12]} /><meshStandardMaterial color={theme.accent} /></mesh>
   </group>;
 }
