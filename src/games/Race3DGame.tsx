@@ -23,20 +23,31 @@ const carNames: Record<CarKind, string> = { sport: 'Street Racer', super: 'Hyper
 function Vehicle({ color, kind, position, rotation = 0 }: { color: string; kind: CarKind; position: [number, number, number]; rotation?: number }) {
   const monster = kind === 'monster';
   const kart = kind === 'kart';
-  const bodyLength = kart ? 1.45 : monster ? 2.05 : kind === 'super' ? 2.15 : 1.9;
-  const wheelRadius = monster ? 0.39 : kart ? 0.2 : 0.27;
-  return <group position={position} rotation={[0, rotation, 0]} scale={monster ? [1.12, 1.22, 1.12] : kart ? [0.86, 0.78, 0.86] : [1, 1, 1]}>
-    <mesh position={[0, 0.48, 0]} castShadow><boxGeometry args={[1.22, 0.42, bodyLength]} /><meshStandardMaterial color={color} roughness={0.32} metalness={0.35} /></mesh>
-    <mesh position={[0, 0.79, -0.12]} castShadow><boxGeometry args={[0.88, 0.48, bodyLength * 0.42]} /><meshStandardMaterial color="#bfe8f6" metalness={0.2} roughness={0.16} /></mesh>
-    <mesh position={[0, 0.34, bodyLength * 0.43]}><boxGeometry args={[0.82, 0.12, 0.08]} /><meshStandardMaterial color="#fff2bd" emissive="#ffbd54" emissiveIntensity={0.7} /></mesh>
-    <mesh position={[0, 0.36, -bodyLength * 0.48]}><boxGeometry args={[0.82, 0.12, 0.08]} /><meshStandardMaterial color="#f05252" emissive="#b91c1c" emissiveIntensity={0.35} /></mesh>
-    {([-1, 1] as const).flatMap(side => [-1, 1].map(axle => <mesh key={side + ':' + axle} position={[side * (monster ? 0.69 : 0.65), wheelRadius, axle * bodyLength * 0.31]} rotation={[0, 0, Math.PI / 2]} castShadow><cylinderGeometry args={[wheelRadius, wheelRadius, monster ? 0.3 : 0.2, 16]} /><meshStandardMaterial color="#18202a" roughness={0.9} /></mesh>))}
-    {kind === 'super' && <mesh position={[0, 0.78, -bodyLength * 0.45]}><boxGeometry args={[1.35, 0.08, 0.18]} /><meshStandardMaterial color={color} /></mesh>}
-    {monster && <mesh position={[0, 0.9, -0.72]}><boxGeometry args={[1.45, 0.12, 0.18]} /><meshStandardMaterial color="#242b36" /></mesh>}
-    {kart && <mesh position={[0, 0.84, -0.35]}><boxGeometry args={[0.12, 0.35, 0.12]} /><meshStandardMaterial color="#222" /></mesh>}
+  const length = kart ? 1.55 : monster ? 2.2 : kind === 'super' ? 2.3 : 2.05;
+  const width = monster ? 1.55 : kart ? 1.12 : 1.28;
+  const wheelRadius = monster ? 0.43 : kart ? 0.22 : 0.29;
+  const rubber = '#101722';
+  const glass = '#8ddcf5';
+  return <group position={position} rotation={[0, rotation, 0]} scale={monster ? [1.12, 1.18, 1.12] : kart ? [0.9, 0.78, 0.9] : [1, 1, 1]}>
+    <mesh position={[0, 0.43, 0]} castShadow receiveShadow><boxGeometry args={[width, 0.34, length]} /><meshPhysicalMaterial color={color} metalness={0.62} roughness={0.24} clearcoat={0.9} clearcoatRoughness={0.18} /></mesh>
+    <mesh position={[0, 0.61, length * 0.08]} castShadow><boxGeometry args={[width * 0.88, 0.16, length * 0.42]} /><meshStandardMaterial color={color} metalness={0.45} roughness={0.3} /></mesh>
+    {!monster && !kart && <mesh position={[0, 0.84, -0.12]} castShadow><boxGeometry args={[width * 0.68, 0.48, length * 0.39]} /><meshPhysicalMaterial color={glass} metalness={0.28} roughness={0.12} transparent opacity={0.78} /></mesh>}
+    {kart && <mesh position={[0, 0.83, -0.2]}><cylinderGeometry args={[0.28, 0.28, 0.12, 16]} /><meshStandardMaterial color="#252b37" /></mesh>}
+    <mesh position={[0, 0.31, length * 0.49]}><boxGeometry args={[width * 0.72, 0.11, 0.08]} /><meshStandardMaterial color="#fff4c2" emissive="#ffdf8a" emissiveIntensity={2.2} /></mesh>
+    {[-1, 1].map(side => <mesh key={side} position={[side * width * 0.32, 0.34, length * 0.495]}><boxGeometry args={[0.16, 0.12, 0.06]} /><meshStandardMaterial color="#fff" emissive="#fff1c2" emissiveIntensity={2.8} /></mesh>)}
+    <mesh position={[0, 0.34, -length * 0.5]}><boxGeometry args={[width * 0.78, 0.1, 0.07]} /><meshStandardMaterial color="#ff344f" emissive="#ff173b" emissiveIntensity={1.6} /></mesh>
+    <mesh position={[0, 0.29, length * 0.505]}><boxGeometry args={[width * 0.48, 0.07, 0.045]} /><meshStandardMaterial color="#171e2a" metalness={0.4} /></mesh>
+    {([-1, 1] as const).flatMap(side => [-1, 1].map(axle => <group key={side + ':' + axle} position={[side * (width * 0.49), wheelRadius, axle * length * 0.32]}>
+      <mesh rotation={[0, 0, Math.PI / 2]} castShadow><cylinderGeometry args={[wheelRadius, wheelRadius, monster ? 0.34 : 0.22, 20]} /><meshStandardMaterial color={rubber} roughness={0.92} /></mesh>
+      <mesh rotation={[0, 0, Math.PI / 2]} position={[side * (monster ? 0.18 : 0.12), 0, 0]}><cylinderGeometry args={[wheelRadius * 0.56, wheelRadius * 0.56, 0.025, 16]} /><meshStandardMaterial color={monster ? '#f7bd42' : '#b8c5d7'} metalness={0.85} roughness={0.22} /></mesh>
+      <mesh rotation={[0, 0, Math.PI / 2]} position={[side * (monster ? 0.2 : 0.135), 0, 0]}><torusGeometry args={[wheelRadius * 0.34, 0.035, 6, 12]} /><meshStandardMaterial color={color} metalness={0.7} roughness={0.25} /></mesh>
+    </group>))}
+    {!kart && <mesh position={[0, 0.68, -length * 0.43]}><boxGeometry args={[width * 0.96, 0.08, 0.13]} /><meshStandardMaterial color={color} metalness={0.55} /></mesh>}
+    {kind === 'super' && <><mesh position={[0, 0.9, -length * 0.49]}><boxGeometry args={[width * 1.18, 0.08, 0.13]} /><meshStandardMaterial color={color} metalness={0.6} /></mesh><mesh position={[0, 0.79, -length * 0.47]}><boxGeometry args={[0.09, 0.2, 0.08]} /><meshStandardMaterial color="#202938" /></mesh></>}
+    {monster && <><mesh position={[0, 0.98, -0.75]}><boxGeometry args={[1.55, 0.13, 0.2]} /><meshStandardMaterial color="#202938" metalness={0.55} /></mesh><mesh position={[0, 0.18, 0]}><boxGeometry args={[1.25, 0.13, 1.7]} /><meshStandardMaterial color="#343d4c" /></mesh></>}
+    {kart && <><mesh position={[0, 0.85, -0.38]}><boxGeometry args={[0.12, 0.42, 0.12]} /><meshStandardMaterial color="#252b37" /></mesh><mesh position={[0, 0.49, -0.2]}><boxGeometry args={[0.72, 0.12, 0.22]} /><meshStandardMaterial color="#111827" /></mesh></>}
   </group>;
 }
-
 function TrackWorld({ lane, color, kind, world, speed, paused, drifting, onCrash, onDistance }: {
   lane: number; color: string; kind: CarKind; world: WorldKind; speed: number; paused: boolean; drifting: boolean;
   onCrash: () => void; onDistance: (distance: number) => void;
@@ -45,6 +56,7 @@ function TrackWorld({ lane, color, kind, world, speed, paused, drifting, onCrash
   const stripes = useRef<THREE.Group>(null);
   const scenery = useRef<THREE.Group>(null);
   const traffic = useRef<THREE.Group>(null);
+  const player = useRef<THREE.Group>(null);
   const distance = useRef(0);
   const hitCooldown = useRef(0);
   const lastReport = useRef(0);
@@ -54,6 +66,13 @@ function TrackWorld({ lane, color, kind, world, speed, paused, drifting, onCrash
     if (paused) return;
     const step = Math.min(delta, 0.05) * speed * 0.32;
     distance.current += step;
+    if (player.current) {
+      const targetX = laneX[lane];
+      player.current.position.x = THREE.MathUtils.damp(player.current.position.x, targetX, 9, delta);
+      const steering = THREE.MathUtils.clamp((targetX - player.current.position.x) * -0.16, -0.2, 0.2);
+      player.current.rotation.z = THREE.MathUtils.damp(player.current.rotation.z, steering, 8, delta);
+      player.current.rotation.y = THREE.MathUtils.damp(player.current.rotation.y, drifting ? 0.18 : 0, 7, delta);
+    }
     if (stripes.current) stripes.current.children.forEach(child => { child.position.z += step; if (child.position.z > 8) child.position.z -= 80; });
     if (scenery.current) scenery.current.children.forEach(child => { child.position.z += step; if (child.position.z > 10) child.position.z -= 245; });
     if (traffic.current) traffic.current.children.forEach((child, i) => {
@@ -77,14 +96,21 @@ function TrackWorld({ lane, color, kind, world, speed, paused, drifting, onCrash
     <directionalLight position={[8, 14, 5]} intensity={2} castShadow shadow-mapSize={[1024, 1024]} />
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.12, -45]} receiveShadow><planeGeometry args={[240, 260]} /><meshStandardMaterial color={theme.ground} /></mesh>
     <mesh position={[0, 0, -45]}><boxGeometry args={[8.2, 0.2, 250]} /><meshStandardMaterial color={theme.road} roughness={0.95} /></mesh>
+    <mesh position={[-4.18, 0.16, -45]}><boxGeometry args={[0.22, 0.34, 250]} /><meshStandardMaterial color={theme.accent} metalness={0.35} roughness={0.4} /></mesh>
+    <mesh position={[4.18, 0.16, -45]}><boxGeometry args={[0.22, 0.34, 250]} /><meshStandardMaterial color={theme.accent} metalness={0.35} roughness={0.4} /></mesh>
+    <group>{Array.from({ length: 13 }, (_, i) => <group key={'lamp-' + i} position={[i % 2 ? 5.6 : -5.6, 0, -i * 19 - 5]}>
+      <mesh position={[0, 2.6, 0]}><cylinderGeometry args={[0.055, 0.075, 5.2, 7]} /><meshStandardMaterial color="#354052" metalness={0.65} /></mesh>
+      <mesh position={[i % 2 ? -0.42 : 0.42, 5.1, 0]} rotation={[0, 0, i % 2 ? -0.5 : 0.5]}><boxGeometry args={[0.95, 0.08, 0.1]} /><meshStandardMaterial color="#354052" /></mesh>
+      <mesh position={[i % 2 ? -0.82 : 0.82, 4.92, 0]}><sphereGeometry args={[0.16, 8, 8]} /><meshStandardMaterial color="#fff0bd" emissive="#ffe39a" emissiveIntensity={1.4} /></mesh>
+    </group>)}</group>
     <group ref={stripes}>{Array.from({ length: 20 }, (_, i) => <group key={i} position={[0, 0, -i * 4]}><mesh position={[-1.12, 0.015, 0]}><boxGeometry args={[0.045, 0.025, 1.7]} /><meshStandardMaterial color="#e8edf2" /></mesh><mesh position={[1.12, 0.015, 0]}><boxGeometry args={[0.045, 0.025, 1.7]} /><meshStandardMaterial color="#e8edf2" /></mesh></group>)}</group>
     <group ref={scenery}>{sceneryItems.map((item, i) => <group key={i} position={[item.x, 0, item.z]} scale={item.size}>
-      {world === 'city' ? <><mesh position={[0, 2.4, 0]}><boxGeometry args={[2.1, 4.8, 2]} /><meshStandardMaterial color={i % 2 ? '#64748b' : '#8b9ab0'} /></mesh><mesh position={[0, 4.9, 0]}><boxGeometry args={[1.5, 0.12, 1.5]} /><meshStandardMaterial color={theme.accent} emissive={theme.accent} emissiveIntensity={0.4} /></mesh></>
-        : world === 'mountain' ? <mesh position={[0, 1.8, 0]}><coneGeometry args={[2.5, 4.5, 5]} /><meshStandardMaterial color={i % 2 ? '#71859a' : '#9cabb9'} /></mesh>
+      {world === 'city' ? <><mesh position={[0, 2.4, 0]} castShadow><boxGeometry args={[2.1, 4.8, 2]} /><meshStandardMaterial color={i % 2 ? "#52647f" : "#8294ad"} roughness={0.82} /></mesh>{Array.from({length: 6}, (_, w) => <mesh key={w} position={[(w % 2 ? 0.52 : -0.52), 1.15 + Math.floor(w / 2) * 1.15, 1.015]}><planeGeometry args={[0.34, 0.48]} /><meshStandardMaterial color={w % 3 === 0 ? "#ffd98b" : "#9edcf3"} emissive={w % 3 === 0 ? "#f6b94d" : "#4c9ebc"} emissiveIntensity={0.65} /></mesh>)}<mesh position={[0, 4.9, 0]}><boxGeometry args={[1.5, 0.12, 1.5]} /><meshStandardMaterial color={theme.accent} emissive={theme.accent} emissiveIntensity={0.55} /></mesh></>
+        : world === 'mountain' ? <><mesh position={[0, 1.8, 0]}><coneGeometry args={[2.5, 4.5, 5]} /><meshStandardMaterial color={i % 2 ? "#71859a" : "#9cabb9"} roughness={1} /></mesh><mesh position={[0, 3.35, 0]}><coneGeometry args={[1.05, 1.65, 5]} /><meshStandardMaterial color="#eef7ff" roughness={0.95} /></mesh></>
         : <><mesh position={[0, 1.1, 0]}><cylinderGeometry args={[0.13, 0.2, 2.2, 8]} /><meshStandardMaterial color="#76523a" /></mesh><mesh position={[0, 2.5, 0]}><coneGeometry args={[1.25, 2.6, 7]} /><meshStandardMaterial color={world === 'desert' ? '#58804c' : world === 'beach' ? '#4d9d73' : '#2e8058'} /></mesh></>}
     </group>)}</group>
     <group ref={traffic}>{cars.map((car, i) => <group key={i} position={[laneX[car.lane], 0, car.z]}><Vehicle color={car.color} kind={i % 3 === 0 ? 'kart' : 'sport'} position={[0, 0, 0]} rotation={Math.PI} /></group>)}</group>
-    <Vehicle color={color} kind={kind} position={[laneX[lane], 0, 3.3]} rotation={drifting ? 0.18 : 0} />
+    <group ref={player} position={[laneX[lane], 0, 3.3]}><Vehicle color={color} kind={kind} position={[0, 0, 0]} /></group>
     <mesh position={[0, 0.02, 7]}><boxGeometry args={[8.2, 0.04, 0.12]} /><meshStandardMaterial color={theme.accent} /></mesh>
   </group>;
 }
