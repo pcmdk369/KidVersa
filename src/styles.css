@@ -26,3 +26,32 @@ button,a,input,select{font-family:inherit}button:focus-visible,a:focus-visible,i
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 
 .achievement-shelf{padding:38px 8% 12px;background:#fff}.achievement-heading h2{font-size:22px;letter-spacing:-.6px;margin:8px 0}.achievement-heading p{font-size:12px;color:#858ca1;margin:0}.achievement-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:20px 0 10px}.achievement{display:flex;align-items:center;gap:12px;padding:14px;background:#f7f7fb;border:1px solid #eceef5;border-radius:14px;opacity:.68}.achievement.unlocked{opacity:1;background:linear-gradient(120deg,#fff9e9,#f4f0ff);border-color:#f2e2b5}.achievement-medal{width:38px;height:38px;border-radius:12px;background:#e8e9f1;color:#8c91a5;display:grid;place-items:center;font-size:18px;font-weight:950}.achievement.unlocked .achievement-medal{background:#ffe6a7;color:#a56c1b}.achievement b,.achievement small{display:block}.achievement b{font-size:11px;color:#323c5b}.achievement small{font-size:9px;color:#858ca1;margin-top:4px}@media(max-width:760px){.achievement-shelf{padding:30px 5% 8px}.achievement-list{grid-template-columns:1fr}.achievement{padding:11px}}
+
+
+/* Featured 3D racing world */
+.featured-race{margin:0 8% 12px;min-height:310px;border-radius:26px;overflow:hidden;position:relative;display:grid;grid-template-columns:1.05fr .95fr;background:radial-gradient(ellipse at 76% 48%,#394b91 0%,#202b58 37%,#111a36 78%);color:#fff;box-shadow:0 22px 55px #202c5b24}
+.featured-race-copy{position:relative;z-index:2;padding:38px 42px;align-self:center}
+.featured-kicker{font-size:9px;letter-spacing:2.2px;font-weight:950;color:#ffd878}
+.featured-race h2{font-size:clamp(28px,4vw,43px);line-height:1.02;letter-spacing:-1.8px;margin:13px 0}
+.featured-race h2 em{font-style:normal;color:#a99cff}
+.featured-race-copy>p{max-width:440px;color:#c6d0ee;font-size:12px;line-height:1.8}
+.featured-tags{display:flex;gap:7px;flex-wrap:wrap;margin:17px 0 20px}
+.featured-tags span{padding:7px 10px;border:1px solid #ffffff25;border-radius:30px;background:#ffffff0c;color:#e1e7ff;font-size:9px;font-weight:750}
+.featured-race-button{border:0;border-radius:11px;padding:13px 17px;background:linear-gradient(100deg,#9a7cff,#6a5be8);color:#fff;font:inherit;font-size:11px;font-weight:900;box-shadow:0 9px 25px #080d2c66;cursor:pointer}
+.featured-race-button span{padding-left:18px}
+.featured-race-art{position:relative;min-height:280px;overflow:hidden;perspective:650px}
+.race-orbit{position:absolute;border:1px solid #a6b5ff42;border-radius:50%;width:340px;height:150px;left:50%;top:48%;transform:translate(-50%,-50%) rotate(-23deg)}
+.race-orbit.orbit-b{width:270px;height:240px;transform:translate(-50%,-50%) rotate(58deg);border-color:#9d8aff35}
+.race-neon-road{position:absolute;left:12%;right:-8%;height:115px;bottom:35px;transform:rotate(-13deg) skewX(-24deg);border-top:3px solid #5de4ed;border-bottom:3px solid #796cff;background:linear-gradient(180deg,#111a36aa,#10172b);box-shadow:0 -8px 30px #49d9ef25,0 8px 30px #7766ff25}
+.race-neon-road i{position:absolute;top:50%;height:3px;width:22%;background:#ffe28c;box-shadow:0 0 14px #ffe28c;left:12%}
+.race-neon-road i:nth-child(2){left:48%}.race-neon-road i:nth-child(3){left:82%}
+.race-showcase-car{position:absolute;width:220px;height:82px;left:50%;top:51%;transform:translate(-50%,-50%) rotate(-9deg) skewX(-12deg);border-radius:45% 28% 22% 22%;background:linear-gradient(160deg,#ffb36d 0%,#f45c62 38%,#8f3b91 100%);border:1px solid #ffd4b27a;box-shadow:0 22px 35px #050b25a8,0 0 32px #f77dba55}
+.race-showcase-car:before{content:"";position:absolute;left:48px;top:-36px;width:125px;height:48px;border-radius:55% 45% 12% 12%;background:linear-gradient(140deg,#b9f0ff,#526ca8 65%,#202e55);border:2px solid #ffd3b2}
+.race-showcase-car:after{content:"";position:absolute;left:12px;right:12px;bottom:13px;height:5px;background:#ffd1a2;border-radius:8px;box-shadow:0 0 13px #ff9e6b}
+.car-glass{position:absolute;left:95px;top:-29px;width:48px;height:33px;background:#c5f5ff88;border-radius:50% 35% 0 0}
+.car-wheel{position:absolute;bottom:-13px;width:39px;height:39px;border:8px solid #101827;border-radius:50%;background:radial-gradient(circle,#c9d5e8 0 22%,#68758e 24% 45%,#1b2538 48%);box-shadow:0 4px 9px #0008}
+.wheel-a{left:35px}.wheel-b{right:32px}
+.car-light{position:absolute;right:4px;top:24px;width:18px;height:8px;background:#fff1b6;box-shadow:0 0 16px #fff1b6;border-radius:4px}
+.race-art-label{position:absolute;right:23px;bottom:18px;color:#aeb8e8;font-size:8px;letter-spacing:3px;font-weight:900}
+@media(max-width:760px){.featured-race{margin:0 5% 8px;grid-template-columns:1fr;min-height:450px}.featured-race-copy{padding:28px 24px 0}.featured-race-art{min-height:205px}.race-showcase-car{top:48%;transform:translate(-50%,-50%) scale(.82) rotate(-9deg) skewX(-12deg)}.race-neon-road{bottom:24px}.race-art-label{bottom:8px}}
+@media(prefers-reduced-motion:reduce){.featured-race *{scroll-behavior:auto}}
